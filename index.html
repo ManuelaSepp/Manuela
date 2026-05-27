@@ -1,0 +1,4304 @@
+<!DOCTYPE html>
+<!-- Einsatzformular Allgemein | JSON eingebettet | Export: 2026-05-26T18:32:51.293Z | UX+Bericht-Fix aktiv -->
+
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Einsatzformular – JSON Arbeitsversion</title>
+  <style>
+    :root {
+      --bg:#f6f1ea; --card:#fff; --soft:#f1ebe3; --border:#e2d6c9; --text:#24211f;
+      --muted:#70675f; --accent:#8fb3a6; --accent2:#6f9a8b; --warn:#a05a4f;
+      --shadow:0 10px 26px rgba(90,70,50,.09); --radius:18px;
+    }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:Arial,Helvetica,sans-serif; background:var(--bg); color:var(--text); }
+    main { display:grid; grid-template-columns:minmax(680px,1fr) 610px; gap:18px; padding:24px; align-items:start; }
+    .topbar { grid-column:1 / -1; background:var(--card); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow); padding:16px 20px; }
+    .topbar h1 { margin:0 0 6px; font-size:25px; }
+    .topbar p { margin:0; color:var(--muted); }
+    .kartenbereich { display:grid; grid-template-columns:repeat(3,minmax(230px,1fr)); gap:16px; }
+    .card,.bericht-card { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden; }
+    .card summary { list-style:none; cursor:pointer; padding:16px 18px; font-size:19px; font-weight:700; display:flex; align-items:center; justify-content:space-between; gap:10px; }
+    .card summary::-webkit-details-marker { display:none; }
+    .card[open] summary { border-bottom:1px solid var(--border); }
+    .toggle-hint,.badge { font-size:12px; font-weight:400; color:var(--muted); background:var(--soft); padding:7px 10px; border-radius:999px; white-space:nowrap; }
+    .content { padding:16px; }
+    .field { margin:0 0 15px; }
+
+    .field-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    @media (max-width:650px) { .field-row { grid-template-columns:1fr; } }
+    .field-title { display:block; font-weight:700; margin:0 0 7px; }
+    select,input[type="text"],textarea { width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:10px; background:#fff; font-size:15px; }
+    .options { display:grid; gap:8px; }
+    .option { display:flex; gap:10px; align-items:flex-start; padding:10px 12px; background:var(--soft); border-radius:10px; line-height:1.25; cursor:pointer; }
+    .option input { width:20px; height:20px; flex:0 0 auto; accent-color:var(--accent2); }
+    .option.disabled-option { opacity:.45; cursor:not-allowed; }
+    .hint { font-size:12px; color:var(--muted); margin-top:4px; padding-left:30px; }
+    .warn { color:var(--warn); font-weight:700; }
+    .bericht-card { position:sticky; top:20px; padding:18px; }
+    .bericht-card h2 { margin:0 0 12px; font-size:25px; }
+    #bericht { min-height:560px; white-space:pre-wrap; padding:18px; background:#fffdfa; border:1px solid var(--border); border-radius:12px; line-height:1.48; font-size:16px; }
+    .actions { display:flex; gap:10px; flex-wrap:wrap; margin-top:12px; }
+    button { border:0; border-radius:18px; padding:11px 16px; font-weight:700; cursor:pointer; background:#ded4c7; }
+    button.primary { background:var(--accent); color:#fff; }
+    .card-close-bottom { margin-top:14px; width:100%; background:#ded4c7; }
+
+    .internal { display:none !important; color:var(--muted); font-size:12px; margin-top:8px; }
+    .hidden { display:none !important; }
+    
+
+@media (min-width:1501px) {
+  main{
+    grid-template-columns:minmax(680px,1fr) 610px;
+  }
+}
+    @media (max-width:850px) { main { padding:12px; } .kartenbereich { grid-template-columns:1fr; } }
+  
+/* === UX-Update: Kartenstatus und klickbarer Header === */
+.card {
+  transition: background-color .18s ease, border-color .18s ease, box-shadow .18s ease, opacity .18s ease;
+}
+.card summary {
+  width: 100%;
+  min-height: 58px;
+}
+.card.card-empty:not([open]) {
+  background: #f7fbff !important;
+  border-color: #dfeaf3 !important;
+}
+.card.card-complete:not([open]) {
+  background: #f2faf2 !important;
+  border-color: #dcecdc !important;
+}
+.card[open] {
+  background: #f2faf2 !important;
+  border-color: #dcecdc !important;
+}
+.card[open] summary {
+  background: #f2faf2 !important;
+}
+.card.card-disabled {
+  opacity: .58;
+  pointer-events: none;
+  background: #f8fafc !important;
+}
+.card-lock-hint {
+  margin: 8px 0 10px 0;
+  padding: 9px 12px;
+  border-radius: 10px;
+  background: #f7fbff;
+  border: 1px solid #dfeaf3;
+  color: #667085;
+  font-size: 13px;
+  line-height: 1.35;
+}
+#bericht[contenteditable="true"] {
+  cursor: text;
+  outline: none;
+}
+#bericht[contenteditable="true"]:focus {
+  box-shadow: inset 0 0 0 2px rgba(143,179,166,.35);
+}
+
+
+/* === Responsive Layout stabil === */
+@media (min-width:1501px) {
+  main {
+    grid-template-columns:minmax(680px,1fr) 610px;
+  }
+  .bericht-card {
+    position:sticky;
+    top:20px;
+    order:initial;
+  }
+  .kartenbereich {
+    order:initial;
+  }
+}
+
+@media (max-width:1500px) {
+  main {
+    grid-template-columns:1fr !important;
+  }
+  .kartenbereich {
+    order:1;
+  }
+  .bericht-card {
+    position:static !important;
+    order:2;
+    width:100%;
+  }
+}
+
+@media (max-width:850px) {
+  main {
+    padding:12px;
+  }
+  .kartenbereich {
+    grid-template-columns:1fr;
+  }
+}
+
+
+/* === FINAL: Responsive Ansicht Desktop / Tablet / Handy === */
+@media (min-width:1501px) {
+  main {
+    grid-template-columns:minmax(680px,1fr) 610px !important;
+  }
+  .bericht-card {
+    position:sticky !important;
+    top:20px;
+    order:initial;
+  }
+  .kartenbereich {
+    order:initial;
+  }
+}
+
+@media (max-width:1500px) {
+  main {
+    grid-template-columns:1fr !important;
+  }
+  .kartenbereich {
+    order:1 !important;
+  }
+  .bericht-card {
+    position:static !important;
+    order:2 !important;
+    width:100%;
+  }
+}
+
+@media (max-width:850px) {
+  main {
+    padding:12px !important;
+  }
+  .kartenbereich {
+    grid-template-columns:1fr !important;
+  }
+}
+
+
+/* === FINAL OVERRIDE: Tablet wirklich untereinander === */
+@media (max-width:1500px) {
+  main {
+    display:grid !important;
+    grid-template-columns:1fr !important;
+  }
+  #kartenbereich,
+  .kartenbereich {
+    order:1 !important;
+    width:100% !important;
+  }
+  .bericht-card {
+    position:static !important;
+    order:2 !important;
+    width:100% !important;
+    max-width:none !important;
+  }
+}
+
+@media (min-width:1501px) {
+  main {
+    display:grid !important;
+    grid-template-columns:minmax(680px,1fr) 610px !important;
+  }
+  .bericht-card {
+    position:sticky !important;
+    top:20px !important;
+    order:initial !important;
+  }
+}
+
+
+/* === FINAL HARD FIX: Tablet Bericht wirklich unter Karten === */
+@media (max-width:1800px) {
+  main {
+    display:grid !important;
+    grid-template-columns:1fr !important;
+  }
+
+  .topbar {
+    grid-column:1 / -1 !important;
+    order:0 !important;
+  }
+
+  #kartenbereich,
+  .kartenbereich {
+    grid-column:1 / -1 !important;
+    order:1 !important;
+    width:100% !important;
+  }
+
+  .bericht-card {
+    grid-column:1 / -1 !important;
+    position:static !important;
+    order:2 !important;
+    width:100% !important;
+    max-width:none !important;
+  }
+}
+
+@media (min-width:1801px) {
+  main {
+    display:grid !important;
+    grid-template-columns:minmax(680px,1fr) 610px !important;
+  }
+
+  .topbar {
+    grid-column:1 / -1 !important;
+    order:initial !important;
+  }
+
+  #kartenbereich,
+  .kartenbereich {
+    grid-column:auto !important;
+    order:initial !important;
+  }
+
+  .bericht-card {
+    grid-column:auto !important;
+    position:sticky !important;
+    top:20px !important;
+    order:initial !important;
+  }
+}
+
+
+/* === FINAL: Kartenkopf / Öffnen-Button sauber im Rand halten === */
+.card summary {
+  padding:16px 18px !important;
+  gap:12px !important;
+  overflow:hidden !important;
+}
+
+.card summary > span:first-child,
+.card summary .card-title {
+  min-width:0 !important;
+  overflow-wrap:anywhere !important;
+}
+
+.toggle-hint,
+.badge {
+  flex:0 0 auto !important;
+  max-width:92px !important;
+  text-align:center !important;
+  padding:7px 9px !important;
+}
+
+@media (max-width:1500px) {
+  .card summary {
+    padding:15px 16px !important;
+  }
+
+  .toggle-hint,
+  .badge {
+    font-size:11px !important;
+    padding:6px 8px !important;
+    max-width:78px !important;
+  }
+}
+
+@media (max-width:700px) {
+  .card summary {
+    padding:14px 14px !important;
+    font-size:18px !important;
+  }
+
+  .toggle-hint,
+  .badge {
+    max-width:72px !important;
+  }
+}
+
+
+/* === Compact Header === */
+.topbar{
+  padding:8px 14px !important;
+  min-height:auto !important;
+}
+
+.topbar h1{
+  margin:0 !important;
+  font-size:18px !important;
+  line-height:1.2 !important;
+}
+
+.topbar p{
+  display:none !important;
+}
+
+</style>
+</head>
+<body>
+<main>
+  <section class="topbar">
+    <h1>Einsatzformular</h1>
+    <p>Arbeitsversion liest die Karten aus <strong>basis_allgemein.json</strong>. Profil: <span id="profilInfo"></span></p>
+  </section>
+
+  <section id="kartenbereich" class="kartenbereich"></section>
+
+  <aside class="bericht-card">
+    <h2>Gesamtbericht</h2>
+    <div id="bericht" contenteditable="true" spellcheck="true"></div>
+    <div class="actions">
+      <button class="primary" id="copyBtn" type="button">Bericht kopieren</button>
+      <button id="clearBtn" type="button">Eingaben löschen</button>
+    </div>
+    <div class="internal" id="debugInfo"></div>
+  </aside>
+</main>
+
+<script>
+const BASIS = {
+  "profil": "allgemein",
+  "exportiertAm": "2026-05-26T18:32:51.293Z",
+  "karten": [
+    {
+      "blatt": "0_Adressänderungen",
+      "bereich": "Adressänderung",
+      "typ": "Eingabefeld",
+      "id": "adresse_klinik",
+      "anzeige": "Klinik",
+      "bericht": "{Klinik}",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "Adressblock; bleibt als eigener Block im Bericht.",
+      "ausgabeart": "steuerwert",
+      "satzgruppe": "adressdaten",
+      "reihenfolge": 10,
+      "status": ""
+    },
+    {
+      "blatt": "0_Adressänderungen",
+      "bereich": "Adressänderung",
+      "typ": "Eingabefeld",
+      "id": "adresse_plz",
+      "anzeige": "PLZ",
+      "bericht": "{PLZ}",
+      "hinweis": "Nur Ziffern.",
+      "abhaengigkeit": "",
+      "logik": "Adressblock.",
+      "ausgabeart": "steuerwert",
+      "satzgruppe": "adressdaten",
+      "reihenfolge": 20,
+      "status": ""
+    },
+    {
+      "blatt": "0_Adressänderungen",
+      "bereich": "Adressänderung",
+      "typ": "Eingabefeld",
+      "id": "adresse_ort",
+      "anzeige": "Ort",
+      "bericht": "{Ort}",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "Adressblock.",
+      "ausgabeart": "steuerwert",
+      "satzgruppe": "adressdaten",
+      "reihenfolge": 30,
+      "status": ""
+    },
+    {
+      "blatt": "0_Adressänderungen",
+      "bereich": "Adressänderung",
+      "typ": "Eingabefeld",
+      "id": "adresse_strasse",
+      "anzeige": "Straße",
+      "bericht": "{Straße}",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "Adressblock.",
+      "ausgabeart": "steuerwert",
+      "satzgruppe": "adressdaten",
+      "reihenfolge": 40,
+      "status": ""
+    },
+    {
+      "blatt": "0_Adressänderungen",
+      "bereich": "Adressänderung",
+      "typ": "Eingabefeld",
+      "id": "adresse_hausnummer",
+      "anzeige": "Hausnummer",
+      "bericht": "{Hausnummer}",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "Adressblock.",
+      "ausgabeart": "steuerwert",
+      "satzgruppe": "adressdaten",
+      "reihenfolge": 50,
+      "status": ""
+    },
+    {
+      "blatt": "0_Adressänderungen",
+      "bereich": "Adressänderung",
+      "typ": "Dropdown",
+      "id": "adresse_region",
+      "anzeige": "Bundesland / Kanton",
+      "bericht": "{Bundesland/Kanton}",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "DACH-Region; später ggf. aus Liste laden.",
+      "ausgabeart": "steuerwert",
+      "satzgruppe": "adressdaten",
+      "reihenfolge": 60,
+      "status": ""
+    },
+    {
+      "blatt": "1_Begrüßung",
+      "bereich": "Begrüßung",
+      "typ": "Dropdown",
+      "id": "keine_begruessung",
+      "anzeige": "Keine Begrüßung",
+      "bericht": "",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "",
+      "ausgabeart": "steuerwert",
+      "satzgruppe": "begruessung",
+      "reihenfolge": 10,
+      "status": ""
+    },
+    {
+      "blatt": "1_Begrüßung",
+      "bereich": "Begrüßung",
+      "typ": "Dropdown",
+      "id": "hallo",
+      "anzeige": "Hallo",
+      "bericht": "Hallo,",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "",
+      "ausgabeart": "direkt",
+      "satzgruppe": "begruessung",
+      "reihenfolge": 20,
+      "status": ""
+    },
+    {
+      "blatt": "1_Begrüßung",
+      "bereich": "Begrüßung",
+      "typ": "Dropdown",
+      "id": "hallo_fotografen",
+      "anzeige": "Hallo liebe Fotografen,",
+      "bericht": "Hallo liebe Fotografen,",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "",
+      "ausgabeart": "direkt",
+      "satzgruppe": "begruessung",
+      "reihenfolge": 30,
+      "status": ""
+    },
+    {
+      "blatt": "1_Begrüßung",
+      "bereich": "Begrüßung",
+      "typ": "Dropdown",
+      "id": "hallo_ihr_lieben",
+      "anzeige": "Hallo ihr Lieben,",
+      "bericht": "Hallo ihr Lieben,",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "",
+      "ausgabeart": "direkt",
+      "satzgruppe": "begruessung",
+      "reihenfolge": 40,
+      "status": ""
+    },
+    {
+      "blatt": "1_Begrüßung",
+      "bereich": "Begrüßung",
+      "typ": "Dropdown",
+      "id": "guten_morgen",
+      "anzeige": "Guten Morgen",
+      "bericht": "Guten Morgen,",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "",
+      "ausgabeart": "direkt",
+      "satzgruppe": "begruessung",
+      "reihenfolge": 50,
+      "status": ""
+    },
+    {
+      "blatt": "1_Begrüßung",
+      "bereich": "Begrüßung",
+      "typ": "Dropdown",
+      "id": "guten_morgen_fotografen",
+      "anzeige": "Guten Morgen liebe Fotografen,",
+      "bericht": "Guten Morgen liebe Fotografen,",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "",
+      "ausgabeart": "direkt",
+      "satzgruppe": "begruessung",
+      "reihenfolge": 60,
+      "status": ""
+    },
+    {
+      "blatt": "1_Begrüßung",
+      "bereich": "Begrüßung",
+      "typ": "Dropdown",
+      "id": "guten_morgen_ihr_lieben",
+      "anzeige": "Guten Morgen ihr Lieben,",
+      "bericht": "Guten Morgen ihr Lieben,",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "",
+      "ausgabeart": "direkt",
+      "satzgruppe": "begruessung",
+      "reihenfolge": 70,
+      "status": ""
+    },
+    {
+      "blatt": "1_Begrüßung",
+      "bereich": "Begrüßung",
+      "typ": "Dropdown",
+      "id": "guten_abend",
+      "anzeige": "Guten Abend",
+      "bericht": "Guten Abend,",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "",
+      "ausgabeart": "direkt",
+      "satzgruppe": "begruessung",
+      "reihenfolge": 80,
+      "status": ""
+    },
+    {
+      "blatt": "1_Begrüßung",
+      "bereich": "Begrüßung",
+      "typ": "Dropdown",
+      "id": "guten_abend_ihr_lieben",
+      "anzeige": "Guten Abend ihr Lieben,",
+      "bericht": "Guten Abend ihr Lieben,",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "",
+      "ausgabeart": "direkt",
+      "satzgruppe": "begruessung",
+      "reihenfolge": 90,
+      "status": ""
+    },
+    {
+      "blatt": "1_Begrüßung",
+      "bereich": "Begrüßung",
+      "typ": "Dropdown",
+      "id": "keine_abschlussfrage",
+      "anzeige": "Keine Abschlussfrage",
+      "bericht": "",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "",
+      "ausgabeart": "steuerwert",
+      "satzgruppe": "abschlussfrage",
+      "reihenfolge": 100,
+      "status": ""
+    },
+    {
+      "blatt": "1_Begrüßung",
+      "bereich": "Begrüßung",
+      "typ": "Dropdown",
+      "id": "wer_bereithalten",
+      "anzeige": "Wer kann sich denn hier bereithalten?",
+      "bericht": "Wer kann sich denn hier bereithalten?",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "",
+      "ausgabeart": "direkt",
+      "satzgruppe": "abschlussfrage",
+      "reihenfolge": 110,
+      "status": ""
+    },
+    {
+      "blatt": "1_Begrüßung",
+      "bereich": "Begrüßung",
+      "typ": "Dropdown",
+      "id": "wer_übernehmen",
+      "anzeige": "Wer kann denn hier übernehmen?",
+      "bericht": "Wer kann denn hier übernehmen?",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "",
+      "ausgabeart": "direkt",
+      "satzgruppe": "abschlussfrage",
+      "reihenfolge": 120,
+      "status": "umbau"
+    },
+    {
+      "blatt": "1_Begrüßung",
+      "bereich": "Begrüßung",
+      "typ": "Dropdown",
+      "id": "koennte_sich_bereithalten",
+      "anzeige": "Könnte sich hier jemand bereithalten?",
+      "bericht": "Könnte sich hier jemand bereithalten?",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "",
+      "ausgabeart": "direkt",
+      "satzgruppe": "abschlussfrage",
+      "reihenfolge": 150,
+      "status": ""
+    },
+    {
+      "blatt": "1_Begrüßung",
+      "bereich": "Begrüßung",
+      "typ": "Dropdown",
+      "id": "keine_grussformel",
+      "anzeige": "Keine Grußformel",
+      "bericht": "",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "",
+      "ausgabeart": "steuerwert",
+      "satzgruppe": "grussformel",
+      "reihenfolge": 170,
+      "status": ""
+    },
+    {
+      "blatt": "1_Begrüßung",
+      "bereich": "Begrüßung",
+      "typ": "Dropdown",
+      "id": "liebe_gruesse",
+      "anzeige": "Liebe Grüße",
+      "bericht": "Liebe Grüße",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "",
+      "ausgabeart": "direkt",
+      "satzgruppe": "grussformel",
+      "reihenfolge": 180,
+      "status": ""
+    },
+    {
+      "blatt": "1_Begrüßung",
+      "bereich": "Begrüßung",
+      "typ": "Dropdown",
+      "id": "herzliche_gruesse",
+      "anzeige": "Herzliche Grüße",
+      "bericht": "Herzliche Grüße",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "",
+      "ausgabeart": "direkt",
+      "satzgruppe": "grussformel",
+      "reihenfolge": 190,
+      "status": ""
+    },
+    {
+      "blatt": "1_Begrüßung",
+      "bereich": "Begrüßung",
+      "typ": "Dropdown",
+      "id": "danke_liebe_gruesse",
+      "anzeige": "Danke euch und liebe Grüße",
+      "bericht": "Danke euch und liebe Grüße",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "",
+      "ausgabeart": "direkt",
+      "satzgruppe": "grussformel",
+      "reihenfolge": 200,
+      "status": ""
+    },
+    {
+      "blatt": "1_Begrüßung",
+      "bereich": "Begrüßung",
+      "typ": "Eingabefeld",
+      "id": "gruss_Name",
+      "anzeige": "Name zur Grußformel",
+      "bericht": "{Grußname}",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "Wird an Grußformel angehängt.",
+      "ausgabeart": "steuerwert",
+      "satzgruppe": "grussformel",
+      "reihenfolge": 210,
+      "status": "neu"
+    },
+    {
+      "blatt": "2_Ansprechpartner",
+      "bereich": "Ansprechpartner",
+      "typ": "Dropdown",
+      "id": "papa",
+      "anzeige": "Papa",
+      "bericht": "Papa",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "privat; Artikel dem/den; Name erlaubt.",
+      "ausgabeart": "steuerwert",
+      "satzgruppe": "ansprechpartner_rolle",
+      "reihenfolge": 10,
+      "status": ""
+    },
+    {
+      "blatt": "2_Ansprechpartner",
+      "bereich": "Ansprechpartner",
+      "typ": "Dropdown",
+      "id": "mama",
+      "anzeige": "Mama",
+      "bericht": "Mama",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "privat; Artikel der/die; Name erlaubt.",
+      "ausgabeart": "steuerwert",
+      "satzgruppe": "ansprechpartner_rolle",
+      "reihenfolge": 20,
+      "status": ""
+    },
+    {
+      "blatt": "2_Ansprechpartner",
+      "bereich": "Ansprechpartner",
+      "typ": "Dropdown",
+      "id": "oma",
+      "anzeige": "Oma",
+      "bericht": "Oma",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "privat; Artikel der/die; Name erlaubt.",
+      "ausgabeart": "steuerwert",
+      "satzgruppe": "ansprechpartner_rolle",
+      "reihenfolge": 30,
+      "status": ""
+    },
+    {
+      "blatt": "2_Ansprechpartner",
+      "bereich": "Ansprechpartner",
+      "typ": "Dropdown",
+      "id": "freundin",
+      "anzeige": "Freundin",
+      "bericht": "Freundin",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "privat; Artikel der/die; Name erlaubt.",
+      "ausgabeart": "steuerwert",
+      "satzgruppe": "ansprechpartner_rolle",
+      "reihenfolge": 40,
+      "status": ""
+    },
+    {
+      "blatt": "2_Ansprechpartner",
+      "bereich": "Ansprechpartner",
+      "typ": "Dropdown",
+      "id": "familienangehoeriger",
+      "anzeige": "Familienangehörige/r",
+      "bericht": "Familienangehörigen",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "Keinen Namen anhängen.",
+      "ausgabeart": "steuerwert",
+      "satzgruppe": "ansprechpartner_rolle",
+      "reihenfolge": 50,
+      "status": ""
+    },
+    {
+      "blatt": "2_Ansprechpartner",
+      "bereich": "Ansprechpartner",
+      "typ": "Dropdown",
+      "id": "hebamme",
+      "anzeige": "Hebamme",
+      "bericht": "Hebamme",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "feminin; der/die.",
+      "ausgabeart": "steuerwert",
+      "satzgruppe": "ansprechpartner_rolle",
+      "reihenfolge": 60,
+      "status": ""
+    },
+    {
+      "blatt": "2_Ansprechpartner",
+      "bereich": "Ansprechpartner",
+      "typ": "Dropdown",
+      "id": "schwester",
+      "anzeige": "Schwester",
+      "bericht": "Schwester",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "feminin; der/die.",
+      "ausgabeart": "steuerwert",
+      "satzgruppe": "ansprechpartner_rolle",
+      "reihenfolge": 70,
+      "status": ""
+    },
+    {
+      "blatt": "2_Ansprechpartner",
+      "bereich": "Ansprechpartner",
+      "typ": "Dropdown",
+      "id": "aerztin",
+      "anzeige": "Ärztin",
+      "bericht": "Ärztin",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "feminin; bei Name Dr. einfügen.",
+      "ausgabeart": "steuerwert",
+      "satzgruppe": "ansprechpartner_rolle",
+      "reihenfolge": 80,
+      "status": ""
+    },
+    {
+      "blatt": "2_Ansprechpartner",
+      "bereich": "Ansprechpartner",
+      "typ": "Dropdown",
+      "id": "arzt",
+      "anzeige": "Arzt",
+      "bericht": "Arzt",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "maskulin; bei Name Dr. einfügen.",
+      "ausgabeart": "steuerwert",
+      "satzgruppe": "ansprechpartner_rolle",
+      "reihenfolge": 90,
+      "status": ""
+    },
+    {
+      "blatt": "2_Ansprechpartner",
+      "bereich": "Ansprechpartner",
+      "typ": "Dropdown",
+      "id": "seelsorgerin",
+      "anzeige": "Frau von der Seelsorge",
+      "bericht": "Frau",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "mit der lieben Frau X von der Seelsorge.",
+      "ausgabeart": "steuerwert",
+      "satzgruppe": "ansprechpartner_rolle",
+      "reihenfolge": 100,
+      "status": ""
+    },
+    {
+      "blatt": "2_Ansprechpartner",
+      "bereich": "Ansprechpartner",
+      "typ": "Dropdown",
+      "id": "seelsorger",
+      "anzeige": "Herr von der Seelsorge",
+      "bericht": "Herr",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "mit dem lieben Herrn X von der Seelsorge.",
+      "ausgabeart": "steuerwert",
+      "satzgruppe": "ansprechpartner_rolle",
+      "reihenfolge": 110,
+      "status": ""
+    },
+    {
+      "blatt": "2_Ansprechpartner",
+      "bereich": "Ansprechpartner",
+      "typ": "Dropdown",
+      "id": "sozialdienst",
+      "anzeige": "Sozialdienst",
+      "bericht": "jemandem vom Sozialdienst",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "Ich habe mit jemandem vom Sozialdienst gesprochen.",
+      "ausgabeart": "steuerwert",
+      "satzgruppe": "ansprechpartner_rolle",
+      "reihenfolge": 120,
+      "status": ""
+    },
+    {
+      "blatt": "2_Ansprechpartner",
+      "bereich": "Ansprechpartner",
+      "typ": "Dropdown",
+      "id": "keine_beschreibung",
+      "anzeige": "Keine Beschreibung",
+      "bericht": "",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "",
+      "ausgabeart": "steuerwert",
+      "satzgruppe": "ansprechpartner_beschreibung",
+      "reihenfolge": 130,
+      "status": ""
+    },
+    {
+      "blatt": "2_Ansprechpartner",
+      "bereich": "Ansprechpartner",
+      "typ": "Dropdown",
+      "id": "traurig",
+      "anzeige": "traurig",
+      "bericht": "traurig",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "Adjektivdeklination im Code.",
+      "ausgabeart": "steuerwert",
+      "satzgruppe": "ansprechpartner_beschreibung",
+      "reihenfolge": 140,
+      "status": ""
+    },
+    {
+      "blatt": "2_Ansprechpartner",
+      "bereich": "Ansprechpartner",
+      "typ": "Dropdown",
+      "id": "verzweifelt",
+      "anzeige": "verzweifelt",
+      "bericht": "verzweifelt",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "Adjektivdeklination im Code.",
+      "ausgabeart": "steuerwert",
+      "satzgruppe": "ansprechpartner_beschreibung",
+      "reihenfolge": 150,
+      "status": ""
+    },
+    {
+      "blatt": "2_Ansprechpartner",
+      "bereich": "Ansprechpartner",
+      "typ": "Dropdown",
+      "id": "lieb",
+      "anzeige": "lieb",
+      "bericht": "lieb",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "Adjektivdeklination im Code.",
+      "ausgabeart": "steuerwert",
+      "satzgruppe": "ansprechpartner_beschreibung",
+      "reihenfolge": 160,
+      "status": ""
+    },
+    {
+      "blatt": "2_Ansprechpartner",
+      "bereich": "Ansprechpartner",
+      "typ": "Dropdown",
+      "id": "besorgt",
+      "anzeige": "besorgt",
+      "bericht": "besorgt",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "Adjektivdeklination im Code.",
+      "ausgabeart": "steuerwert",
+      "satzgruppe": "ansprechpartner_beschreibung",
+      "reihenfolge": 170,
+      "status": ""
+    },
+    {
+      "blatt": "2_Ansprechpartner",
+      "bereich": "Ansprechpartner",
+      "typ": "Dropdown",
+      "id": "aufgeloest",
+      "anzeige": "aufgelöst",
+      "bericht": "aufgelöst",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "Adjektivdeklination im Code.",
+      "ausgabeart": "steuerwert",
+      "satzgruppe": "ansprechpartner_beschreibung",
+      "reihenfolge": 180,
+      "status": ""
+    },
+    {
+      "blatt": "2_Ansprechpartner",
+      "bereich": "Ansprechpartner",
+      "typ": "Dropdown",
+      "id": "ruhig",
+      "anzeige": "ruhig",
+      "bericht": "ruhig",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "Adjektivdeklination im Code.",
+      "ausgabeart": "steuerwert",
+      "satzgruppe": "ansprechpartner_beschreibung",
+      "reihenfolge": 190,
+      "status": ""
+    },
+    {
+      "blatt": "2_Ansprechpartner",
+      "bereich": "Ansprechpartner",
+      "typ": "Dropdown",
+      "id": "dankbar",
+      "anzeige": "dankbar",
+      "bericht": "dankbar",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "Adjektivdeklination im Code.",
+      "ausgabeart": "steuerwert",
+      "satzgruppe": "ansprechpartner_beschreibung",
+      "reihenfolge": 200,
+      "status": ""
+    },
+    {
+      "blatt": "2_Ansprechpartner",
+      "bereich": "Ansprechpartner",
+      "typ": "Dropdown",
+      "id": "nett",
+      "anzeige": "nett",
+      "bericht": "nett",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "Adjektivdeklination im Code.",
+      "ausgabeart": "steuerwert",
+      "satzgruppe": "ansprechpartner_beschreibung",
+      "reihenfolge": 210,
+      "status": ""
+    },
+    {
+      "blatt": "2_Ansprechpartner",
+      "bereich": "Ansprechpartner",
+      "typ": "Dropdown",
+      "id": "gesprochen",
+      "anzeige": "gesprochen",
+      "bericht": "gesprochen",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "",
+      "ausgabeart": "steuerwert",
+      "satzgruppe": "ansprechpartner_gespraechsart",
+      "reihenfolge": 220,
+      "status": ""
+    },
+    {
+      "blatt": "2_Ansprechpartner",
+      "bereich": "Ansprechpartner",
+      "typ": "Dropdown",
+      "id": "telefon",
+      "anzeige": "am Telefon",
+      "bericht": "telefon",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "",
+      "ausgabeart": "steuerwert",
+      "satzgruppe": "ansprechpartner_gespraechsart",
+      "reihenfolge": 230,
+      "status": ""
+    },
+    {
+      "blatt": "2_Ansprechpartner",
+      "bereich": "Ansprechpartner",
+      "typ": "Dropdown",
+      "id": "ruecksprache",
+      "anzeige": "Rücksprache gehalten",
+      "bericht": "ruecksprache",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "",
+      "ausgabeart": "steuerwert",
+      "satzgruppe": "ansprechpartner_gespraechsart",
+      "reihenfolge": 240,
+      "status": ""
+    },
+    {
+      "blatt": "2_Ansprechpartner",
+      "bereich": "Ansprechpartner",
+      "typ": "Regel",
+      "id": "arzt_dr",
+      "anzeige": "Dr. vor Name",
+      "bericht": "Dr. nach Arzt/Ärztin vor Namen einfügen",
+      "hinweis": "",
+      "abhaengigkeit": "Rolle=Arzt/Ärztin + Name",
+      "logik": "Beispiel: Ärztin Dr. Jenny.",
+      "ausgabeart": "regel",
+      "satzgruppe": "ansprechpartner_rolle",
+      "reihenfolge": 250,
+      "status": ""
+    },
+    {
+      "blatt": "2_Ansprechpartner",
+      "bereich": "Ansprechpartner",
+      "typ": "Regel",
+      "id": "name_gross",
+      "anzeige": "Name groß schreiben",
+      "bericht": "Name automatisch groß schreiben",
+      "hinweis": "",
+      "abhaengigkeit": "Name eingegeben",
+      "logik": "Jenny statt jenny.",
+      "ausgabeart": "regel",
+      "satzgruppe": "ansprechpartner_rolle",
+      "reihenfolge": 260,
+      "status": ""
+    },
+    {
+      "blatt": "3_Lebendbilder",
+      "bereich": "Lebendbilder",
+      "typ": "Dropdown",
+      "id": "keine_geburt",
+      "anzeige": "Bitte auswählen",
+      "bericht": "",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "",
+      "ausgabeart": "steuerwert",
+      "satzgruppe": "lebendbilder_geburt",
+      "reihenfolge": 10,
+      "status": "löschen"
+    },
+    {
+      "blatt": "3_Lebendbilder",
+      "bereich": "Lebendbilder",
+      "typ": "Dropdown",
+      "id": "kind_vor_tagen",
+      "anzeige": "Kind geboren",
+      "bericht": "Die Geburt fand vor {Alter} in der {SSW}. SSW statt.",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "Nur ausgeben wenn Alter und SSW vorhanden.",
+      "ausgabeart": "direkt",
+      "satzgruppe": "lebendbilder_geburt",
+      "reihenfolge": 20,
+      "status": ""
+    },
+    {
+      "blatt": "3_Lebendbilder",
+      "bereich": "Lebendbilder",
+      "typ": "Dropdown",
+      "id": "LEB-0001",
+      "anzeige": "Es handelt sich um eine palliative Geburt. ",
+      "bericht": "Es handelt sich um eine palliative Geburt. ",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "",
+      "ausgabeart": "direkt",
+      "satzgruppe": "lebendbilder_prognose",
+      "reihenfolge": 30,
+      "status": "neu"
+    },
+    {
+      "blatt": "3_Lebendbilder",
+      "bereich": "Lebendbilder",
+      "typ": "Dropdown",
+      "id": "LEB-0002",
+      "anzeige": "versterben nicht absehbar",
+      "bericht": "Im Moment ist der Zeitpunkt des Versterbens nicht absehbar.",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "",
+      "ausgabeart": "direkt",
+      "satzgruppe": "lebendbilder_prognose",
+      "reihenfolge": 40,
+      "status": "neu"
+    },
+    {
+      "blatt": "3_Lebendbilder",
+      "bereich": "Lebendbilder",
+      "typ": "Eingabefeld",
+      "id": "ssw",
+      "anzeige": "SSW",
+      "bericht": "{SSW}. SSW",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "Nur ganze Wochen im Beispiel / Eingabe.",
+      "ausgabeart": "steuerwert",
+      "satzgruppe": "lebendbilder_alter",
+      "reihenfolge": 50,
+      "status": ""
+    },
+    {
+      "blatt": "3_Lebendbilder",
+      "bereich": "Lebendbilder",
+      "typ": "Eingabefeld",
+      "id": "alter_zahl",
+      "anzeige": "Alter Zahl",
+      "bericht": "{Alter}",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "Wird mit Alterseinheit kombiniert.",
+      "ausgabeart": "steuerwert",
+      "satzgruppe": "lebendbilder_alter",
+      "reihenfolge": 60,
+      "status": ""
+    },
+    {
+      "blatt": "3_Lebendbilder",
+      "bereich": "Lebendbilder",
+      "typ": "Dropdown",
+      "id": "keine_altersangabe",
+      "anzeige": "Keine Altersangabe",
+      "bericht": "",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "",
+      "ausgabeart": "steuerwert",
+      "satzgruppe": "lebendbilder_alter",
+      "reihenfolge": 70,
+      "status": ""
+    },
+    {
+      "blatt": "3_Lebendbilder",
+      "bereich": "Lebendbilder",
+      "typ": "Dropdown",
+      "id": "tage",
+      "anzeige": "Tage",
+      "bericht": "Tage",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "",
+      "ausgabeart": "steuerwert",
+      "satzgruppe": "lebendbilder_alter",
+      "reihenfolge": 80,
+      "status": ""
+    },
+    {
+      "blatt": "3_Lebendbilder",
+      "bereich": "Lebendbilder",
+      "typ": "Dropdown",
+      "id": "wochen",
+      "anzeige": "Wochen",
+      "bericht": "Wochen",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "",
+      "ausgabeart": "steuerwert",
+      "satzgruppe": "lebendbilder_alter",
+      "reihenfolge": 90,
+      "status": ""
+    },
+    {
+      "blatt": "3_Lebendbilder",
+      "bereich": "Lebendbilder",
+      "typ": "Dropdown",
+      "id": "monate",
+      "anzeige": "Monate",
+      "bericht": "Monate",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "",
+      "ausgabeart": "steuerwert",
+      "satzgruppe": "lebendbilder_alter",
+      "reihenfolge": 100,
+      "status": ""
+    },
+    {
+      "blatt": "3_Lebendbilder",
+      "bereich": "Lebendbilder",
+      "typ": "Dropdown",
+      "id": "zustand_verschlechtert",
+      "anzeige": "Zustand deutlich verschlechtert",
+      "bericht": "Nun hat sich der Zustand leider deutlich verschlechtert.",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "",
+      "ausgabeart": "direkt",
+      "satzgruppe": "lebendbilder_prognose",
+      "reihenfolge": 110,
+      "status": ""
+    },
+    {
+      "blatt": "3_Lebendbilder",
+      "bereich": "Lebendbilder",
+      "typ": "Dropdown",
+      "id": "ueberleben_nicht_zu_erwarten",
+      "anzeige": "Überleben leider nicht zu erwarten",
+      "bericht": "Die aktuelle Situation macht ein Überleben leider nicht möglich.",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "",
+      "ausgabeart": "direkt",
+      "satzgruppe": "lebendbilder_prognose",
+      "reihenfolge": 120,
+      "status": "löschen"
+    },
+    {
+      "blatt": "3_Lebendbilder",
+      "bereich": "Lebendbilder",
+      "typ": "Dropdown",
+      "id": "prognose_sehr_schlecht",
+      "anzeige": "Prognose sehr schlecht",
+      "bericht": "Die Prognose ist leider sehr schlecht.",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "",
+      "ausgabeart": "direkt",
+      "satzgruppe": "lebendbilder_prognose",
+      "reihenfolge": 130,
+      "status": ""
+    },
+    {
+      "blatt": "3_Lebendbilder",
+      "bereich": "Lebendbilder",
+      "typ": "Dropdown",
+      "id": "ueberleben_nicht_moeglich",
+      "anzeige": "Überleben nach Einschätzung nicht möglich",
+      "bericht": "Ein Überleben des Kindes ist nach aktueller Einschätzung leider nicht möglich.",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "",
+      "ausgabeart": "direkt",
+      "satzgruppe": "lebendbilder_prognose",
+      "reihenfolge": 140,
+      "status": ""
+    },
+    {
+      "blatt": "3_Lebendbilder",
+      "bereich": "Lebendbilder",
+      "typ": "Dropdown",
+      "id": "massnahmen_beenden",
+      "anzeige": "Lebenserhaltende Maßnahmen sollen beendet werden",
+      "bericht": "Es wurde besprochen, dass die lebenserhaltenden Maßnahmen beendet werden sollen.",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "",
+      "ausgabeart": "direkt",
+      "satzgruppe": "lebendbilder_prognose",
+      "reihenfolge": 150,
+      "status": ""
+    },
+    {
+      "blatt": "3_Lebendbilder",
+      "bereich": "Lebendbilder",
+      "typ": "Dropdown",
+      "id": "abschaltung_geplant",
+      "anzeige": "Abschaltung der Geräte geplant",
+      "bericht": "Die Abschaltung der Geräte ist für die nächste Zeit geplant.",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "",
+      "ausgabeart": "direkt",
+      "satzgruppe": "lebendbilder_prognose",
+      "reihenfolge": 160,
+      "status": ""
+    },
+    {
+      "blatt": "3_Lebendbilder",
+      "bereich": "Lebendbilder",
+      "typ": "Dropdown",
+      "id": "palliative_massnahmen",
+      "anzeige": "Nur noch palliative Maßnahmen",
+      "bericht": "Es erfolgen nur noch palliative Maßnahmen.",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "",
+      "ausgabeart": "direkt",
+      "satzgruppe": "lebendbilder_prognose",
+      "reihenfolge": 170,
+      "status": ""
+    },
+    {
+      "blatt": "3_Lebendbilder",
+      "bereich": "Lebendbilder",
+      "typ": "Regel",
+      "id": "lebendbilder_eilt",
+      "anzeige": "Lebendbilder-Hinweis",
+      "bericht": "Hier geht es um Lebendbilder, es eilt.",
+      "hinweis": "",
+      "abhaengigkeit": "Wenn Lebendbilder-Felder genutzt werden.",
+      "logik": "Nach Begrüßung einfügen.",
+      "ausgabeart": "regel",
+      "satzgruppe": "lebendbilder_hinweis",
+      "reihenfolge": 180,
+      "status": ""
+    },
+    {
+      "blatt": "4_Einleitung",
+      "bereich": "Einleitung",
+      "typ": "Dropdown",
+      "id": "einleitung_ist",
+      "anzeige": "Mutter ist zur Einleitung in der Klinik",
+      "bericht": "Die Mutter befindet sich zur Einleitung in der Klinik.",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "Ausgabe schöner: Die Mutter ist seit {Zeitpunkt/Tage} zur Einleitung in der Klinik.",
+      "ausgabeart": "direkt",
+      "satzgruppe": "einleitung_status",
+      "reihenfolge": 10,
+      "status": ""
+    },
+    {
+      "blatt": "4_Einleitung",
+      "bereich": "Einleitung",
+      "typ": "Dropdown",
+      "id": "einleitung_wird",
+      "anzeige": "Mutter wird zur Einleitung in die Klinik gehen",
+      "bericht": "Die Mutter wird zur Einleitung in die Klinik gehen.",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "Feldlabel dynamisch: Wann?",
+      "ausgabeart": "direkt",
+      "satzgruppe": "einleitung_status",
+      "reihenfolge": 20,
+      "status": ""
+    },
+    {
+      "blatt": "4_Einleitung",
+      "bereich": "Einleitung",
+      "typ": "Dropdown",
+      "id": "dauer_unbekannt",
+      "anzeige": "Dauer bis zur Geburt nicht bekannt",
+      "bericht": "Wie lange es bis zur Geburt dauern wird, ist aktuell nicht bekannt.",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "",
+      "ausgabeart": "direkt",
+      "satzgruppe": "einleitung_status",
+      "reihenfolge": 30,
+      "status": ""
+    },
+    {
+      "blatt": "4_Einleitung",
+      "bereich": "Einleitung",
+      "typ": "Eingabefeld",
+      "id": "einleitung_datum",
+      "anzeige": "Datum / Zeitpunkt",
+      "bericht": "{Zeitpunkt}",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "z. B. Montag, morgen früh, heute Abend.",
+      "ausgabeart": "steuerwert",
+      "satzgruppe": "einleitung_zeit",
+      "reihenfolge": 40,
+      "status": ""
+    },
+    {
+      "blatt": "4_Einleitung",
+      "bereich": "Einleitung",
+      "typ": "Eingabefeld",
+      "id": "einleitung_tage",
+      "anzeige": "Tage",
+      "bericht": "{Tage}",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "nur Zahlen.",
+      "ausgabeart": "steuerwert",
+      "satzgruppe": "einleitung_zeit",
+      "reihenfolge": 60,
+      "status": ""
+    },
+    {
+      "blatt": "4_Einleitung",
+      "bereich": "Einleitung",
+      "typ": "Dropdown",
+      "id": "geburt_zeitnah",
+      "anzeige": "Wehen, Geburt bald",
+      "bericht": "Die Mutter hat schon Wehen und die Geburt wird bald erwartet.",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "Zusätzlich zu Einleitungszeitpunkt.",
+      "ausgabeart": "direkt",
+      "satzgruppe": "einleitung_erwartung",
+      "reihenfolge": 70,
+      "status": ""
+    },
+    {
+      "blatt": "4_Einleitung",
+      "bereich": "Einleitung",
+      "typ": "Dropdown",
+      "id": "geburt_heute",
+      "anzeige": "Geburt vermutlich heute",
+      "bericht": "Die Geburt wird vermutlich heute erwartet.",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "Zusätzlich zu Einleitungszeitpunkt.",
+      "ausgabeart": "direkt",
+      "satzgruppe": "einleitung_erwartung",
+      "reihenfolge": 90,
+      "status": ""
+    },
+    {
+      "blatt": "4_Einleitung",
+      "bereich": "Einleitung",
+      "typ": "Dropdown",
+      "id": "geburt_naechste_tage",
+      "anzeige": "Geburt innerhalb der nächsten Tage",
+      "bericht": "Die Geburt wird innerhalb der nächsten Tage erwartet.",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "Zusätzlich zu Einleitungszeitpunkt.",
+      "ausgabeart": "direkt",
+      "satzgruppe": "einleitung_erwartung",
+      "reihenfolge": 100,
+      "status": "neu"
+    },
+    {
+      "blatt": "4_Einleitung",
+      "bereich": "Einleitung",
+      "typ": "Dropdown",
+      "id": "einleitung_zieht_sich",
+      "anzeige": "Einleitung kann sich noch ziehen",
+      "bericht": "Die Einleitung kann sich noch ziehen.",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "Zusätzlich zu Einleitungszeitpunkt.",
+      "ausgabeart": "direkt",
+      "satzgruppe": "einleitung_erwartung",
+      "reihenfolge": 110,
+      "status": ""
+    },
+    {
+      "blatt": "5_Aktuelle_Situation",
+      "bereich": "Aktuelle Situation",
+      "typ": "Dropdown",
+      "id": "erstes_kind",
+      "anzeige": "Erstes Kind",
+      "bericht": "Das Mäuschen wäre das erste Kind der Familie.",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "Kindfolge getrennt von Kindern an der Hand betrachten. Wenn erstes Kind, keine Kinder an der Hand auswählbar",
+      "ausgabeart": "direkt",
+      "satzgruppe": "kindfolge",
+      "reihenfolge": 10,
+      "status": ""
+    },
+    {
+      "blatt": "5_Aktuelle_Situation",
+      "bereich": "Aktuelle Situation",
+      "typ": "Dropdown",
+      "id": "zweites_kind",
+      "anzeige": "Zweites Kind",
+      "bericht": "Das Mäuschen wäre das zweite Kind der Familie.",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "Kindfolge getrennt von Kindern an der Hand betrachten.",
+      "ausgabeart": "direkt",
+      "satzgruppe": "kindfolge",
+      "reihenfolge": 20,
+      "status": ""
+    },
+    {
+      "blatt": "5_Aktuelle_Situation",
+      "bereich": "Aktuelle Situation",
+      "typ": "Dropdown",
+      "id": "drittes_kind",
+      "anzeige": "Drittes Kind",
+      "bericht": "Das Mäuschen wäre das dritte Kind der Familie.",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "Kindfolge getrennt von Kindern an der Hand betrachten.",
+      "ausgabeart": "direkt",
+      "satzgruppe": "kindfolge",
+      "reihenfolge": 30,
+      "status": ""
+    },
+    {
+      "blatt": "5_Aktuelle_Situation",
+      "bereich": "Aktuelle Situation",
+      "typ": "Dropdown",
+      "id": "viertes_kind",
+      "anzeige": "Viertes Kind",
+      "bericht": "Das Mäuschen wäre das vierte Kind der Familie.",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "Kindfolge getrennt von Kindern an der Hand betrachten.",
+      "ausgabeart": "direkt",
+      "satzgruppe": "kindfolge",
+      "reihenfolge": 40,
+      "status": ""
+    },
+    {
+      "blatt": "5_Aktuelle_Situation",
+      "bereich": "Aktuelle Situation",
+      "typ": "Dropdown",
+      "id": "fuenftes_kind",
+      "anzeige": "Fünftes Kind",
+      "bericht": "Das Mäuschen wäre das fünfte Kind der Familie.",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "Kindfolge getrennt von Kindern an der Hand betrachten.",
+      "ausgabeart": "direkt",
+      "satzgruppe": "kindfolge",
+      "reihenfolge": 50,
+      "status": ""
+    },
+    {
+      "blatt": "5_Aktuelle_Situation",
+      "bereich": "Aktuelle Situation",
+      "typ": "Dropdown",
+      "id": "sechstes_kind",
+      "anzeige": "Sechstes Kind",
+      "bericht": "Das Mäuschen wäre das sechste Kind der Familie.",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "Kindfolge getrennt von Kindern an der Hand betrachten.",
+      "ausgabeart": "direkt",
+      "satzgruppe": "kindfolge",
+      "reihenfolge": 60,
+      "status": ""
+    },
+    {
+      "blatt": "5_Aktuelle_Situation",
+      "bereich": "Aktuelle Situation",
+      "typ": "Dropdown",
+      "id": "siebtes_kind",
+      "anzeige": "Siebtes Kind",
+      "bericht": "Das Mäuschen wäre das siebte Kind der Familie.",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "Kindfolge getrennt von Kindern an der Hand betrachten.",
+      "ausgabeart": "direkt",
+      "satzgruppe": "kindfolge",
+      "reihenfolge": 70,
+      "status": ""
+    },
+    {
+      "blatt": "5_Aktuelle_Situation",
+      "bereich": "Aktuelle Situation",
+      "typ": "Dropdown",
+      "id": "keine_kinder_hand",
+      "anzeige": "Keine Kinder",
+      "bericht": "keine Kinder",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "",
+      "ausgabeart": "steuerwert",
+      "satzgruppe": "kinder_an_der_hand",
+      "reihenfolge": 80,
+      "status": ""
+    },
+    {
+      "blatt": "5_Aktuelle_Situation",
+      "bereich": "Aktuelle Situation",
+      "typ": "Dropdown",
+      "id": "ein_kind_hand",
+      "anzeige": "Ein Kind",
+      "bericht": "ein Kind",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "",
+      "ausgabeart": "steuerwert",
+      "satzgruppe": "kinder_an_der_hand",
+      "reihenfolge": 90,
+      "status": ""
+    },
+    {
+      "blatt": "5_Aktuelle_Situation",
+      "bereich": "Aktuelle Situation",
+      "typ": "Dropdown",
+      "id": "zwei_kinder_hand",
+      "anzeige": "Zwei Kinder",
+      "bericht": "zwei Kinder",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "",
+      "ausgabeart": "steuerwert",
+      "satzgruppe": "kinder_an_der_hand",
+      "reihenfolge": 100,
+      "status": ""
+    },
+    {
+      "blatt": "5_Aktuelle_Situation",
+      "bereich": "Aktuelle Situation",
+      "typ": "Dropdown",
+      "id": "drei_kinder_hand",
+      "anzeige": "Drei Kinder",
+      "bericht": "drei Kinder",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "",
+      "ausgabeart": "steuerwert",
+      "satzgruppe": "kinder_an_der_hand",
+      "reihenfolge": 110,
+      "status": ""
+    },
+    {
+      "blatt": "5_Aktuelle_Situation",
+      "bereich": "Aktuelle Situation",
+      "typ": "Dropdown",
+      "id": "vier_kinder_hand",
+      "anzeige": "Vier Kinder",
+      "bericht": "vier Kinder",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "",
+      "ausgabeart": "steuerwert",
+      "satzgruppe": "kinder_an_der_hand",
+      "reihenfolge": 120,
+      "status": ""
+    },
+    {
+      "blatt": "5_Aktuelle_Situation",
+      "bereich": "Aktuelle Situation",
+      "typ": "Dropdown",
+      "id": "fuenf_kinder_hand",
+      "anzeige": "Fünf Kinder",
+      "bericht": "fünf Kinder",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "",
+      "ausgabeart": "steuerwert",
+      "satzgruppe": "kinder_an_der_hand",
+      "reihenfolge": 130,
+      "status": ""
+    },
+    {
+      "blatt": "5_Aktuelle_Situation",
+      "bereich": "Aktuelle Situation",
+      "typ": "Dropdown",
+      "id": "sechs_kinder_hand",
+      "anzeige": "Sechs Kinder",
+      "bericht": "sechs Kinder",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "",
+      "ausgabeart": "steuerwert",
+      "satzgruppe": "kinder_an_der_hand",
+      "reihenfolge": 140,
+      "status": ""
+    },
+    {
+      "blatt": "5_Aktuelle_Situation",
+      "bereich": "Aktuelle Situation",
+      "typ": "Dropdown",
+      "id": "sieben_kinder_hand",
+      "anzeige": "Sieben Kinder",
+      "bericht": "sieben Kinder",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "",
+      "ausgabeart": "steuerwert",
+      "satzgruppe": "kinder_an_der_hand",
+      "reihenfolge": 150,
+      "status": ""
+    },
+    {
+      "blatt": "5_Aktuelle_Situation",
+      "bereich": "Aktuelle Situation",
+      "typ": "Radio",
+      "id": "einling",
+      "anzeige": "Ein Kind",
+      "bericht": "1",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "Standard.",
+      "ausgabeart": "steuerwert",
+      "satzgruppe": "mehrlingsstatus",
+      "reihenfolge": 160,
+      "status": "umbau"
+    },
+    {
+      "blatt": "5_Aktuelle_Situation",
+      "bereich": "Aktuelle Situation",
+      "typ": "Radio",
+      "id": "zwillinge",
+      "anzeige": "Zwillinge",
+      "bericht": "2",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "Beeinflusst Bilder und Kleidung.",
+      "ausgabeart": "steuerwert",
+      "satzgruppe": "mehrlingsstatus",
+      "reihenfolge": 170,
+      "status": ""
+    },
+    {
+      "blatt": "5_Aktuelle_Situation",
+      "bereich": "Aktuelle Situation",
+      "typ": "Radio",
+      "id": "drillinge",
+      "anzeige": "Drillinge",
+      "bericht": "3",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "Beeinflusst Bilder und Kleidung.",
+      "ausgabeart": "steuerwert",
+      "satzgruppe": "mehrlingsstatus",
+      "reihenfolge": 180,
+      "status": ""
+    },
+    {
+      "blatt": "5_Aktuelle_Situation",
+      "bereich": "Aktuelle Situation",
+      "typ": "Radio",
+      "id": "mehrlinge",
+      "anzeige": "Mehrlinge",
+      "bericht": "mehr",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "Beeinflusst Bilder und Kleidung.",
+      "ausgabeart": "steuerwert",
+      "satzgruppe": "mehrlingsstatus",
+      "reihenfolge": 190,
+      "status": ""
+    },
+    {
+      "blatt": "5_Aktuelle_Situation",
+      "bereich": "Aktuelle Situation",
+      "typ": "Checkbox",
+      "id": "erstes_gemeinsames",
+      "anzeige": "Für die Eltern wäre es das erste gemeinsame Kind.",
+      "bericht": "Für die Eltern wäre es das erste gemeinsame Kind.",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "",
+      "ausgabeart": "direkt",
+      "satzgruppe": "familienstruktur",
+      "reihenfolge": 200,
+      "status": ""
+    },
+    {
+      "blatt": "5_Aktuelle_Situation",
+      "bereich": "Aktuelle Situation",
+      "typ": "Checkbox",
+      "id": "papa_kinder",
+      "anzeige": "Der Papa hat Kinder an der Hand.",
+      "bericht": "Der Papa hat Kinder an der Hand.",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "",
+      "ausgabeart": "direkt",
+      "satzgruppe": "familienstruktur",
+      "reihenfolge": 210,
+      "status": ""
+    },
+    {
+      "blatt": "5_Aktuelle_Situation",
+      "bereich": "Aktuelle Situation",
+      "typ": "Checkbox",
+      "id": "mama_kinder",
+      "anzeige": "Die Mama hat Kinder an der Hand.",
+      "bericht": "Die Mama hat Kinder an der Hand.",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "",
+      "ausgabeart": "direkt",
+      "satzgruppe": "familienstruktur",
+      "reihenfolge": 220,
+      "status": ""
+    },
+    {
+      "blatt": "5_Aktuelle_Situation",
+      "bereich": "Aktuelle Situation",
+      "typ": "Dropdown",
+      "id": "eltern_kreisssaal",
+      "anzeige": "Eltern noch im Kreißsaal",
+      "bericht": "Die Eltern sind noch im Kreißsaal.",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "",
+      "ausgabeart": "direkt",
+      "satzgruppe": "aktuelle_situation_status",
+      "reihenfolge": 230,
+      "status": ""
+    },
+    {
+      "blatt": "5_Aktuelle_Situation",
+      "bereich": "Aktuelle Situation",
+      "typ": "Dropdown",
+      "id": "mutter_op",
+      "anzeige": "Mutter noch im OP",
+      "bericht": "Die Mutter ist noch im OP.",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "",
+      "ausgabeart": "direkt",
+      "satzgruppe": "aktuelle_situation_status",
+      "reihenfolge": 240,
+      "status": ""
+    },
+    {
+      "blatt": "5_Aktuelle_Situation",
+      "bereich": "Aktuelle Situation",
+      "typ": "Dropdown",
+      "id": "mutter_kommt_op",
+      "anzeige": "Mutter kommt in den OP",
+      "bericht": "Die Mutter kommt demnächst in den OP.",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "",
+      "ausgabeart": "direkt",
+      "satzgruppe": "aktuelle_situation_status",
+      "reihenfolge": 250,
+      "status": ""
+    },
+    {
+      "blatt": "6_Besonderheiten",
+      "bereich": "Besonderheiten",
+      "typ": "Dropdown",
+      "id": "keine_besonderheiten",
+      "anzeige": "Keine Besonderheiten bekannt",
+      "bericht": "Es sind keine äußerlichen Besonderheiten bekannt.",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "",
+      "ausgabeart": "direkt",
+      "satzgruppe": "besonderheiten_status",
+      "reihenfolge": 10,
+      "status": ""
+    },
+    {
+      "blatt": "6_Besonderheiten",
+      "bereich": "Besonderheiten",
+      "typ": "Dropdown",
+      "id": "besonderheiten_vorhanden",
+      "anzeige": "Besonderheiten vorhanden",
+      "bericht": "Besonderheiten:",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "Zeigt Liste.",
+      "ausgabeart": "steuerwert",
+      "satzgruppe": "besonderheiten_status",
+      "reihenfolge": 20,
+      "status": "umbau"
+    },
+    {
+      "blatt": "6_Besonderheiten",
+      "bereich": "Besonderheiten",
+      "typ": "Dropdown",
+      "id": "besonderheiten_unklar",
+      "anzeige": "Unklar",
+      "bericht": "Ob äußerliche Besonderheiten vorliegen, ist aktuell nicht bekannt.",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "",
+      "ausgabeart": "direkt",
+      "satzgruppe": "besonderheiten_status",
+      "reihenfolge": 30,
+      "status": ""
+    },
+    {
+      "blatt": "6_Besonderheiten",
+      "bereich": "Besonderheiten",
+      "typ": "Checkbox",
+      "id": "klumpfuesschen",
+      "anzeige": "Klumpfüßchen",
+      "bericht": "Klumpfüßchen",
+      "hinweis": "Fußfehlstellung, bei der ein oder beide Füße nach innen oder unten gedreht sein können.",
+      "abhaengigkeit": "Wenn Besonderheiten vorhanden.",
+      "logik": "Hinweis klein/grau unter dem Namen; nicht im Bericht.",
+      "ausgabeart": "listenwert",
+      "satzgruppe": "besonderheiten_liste",
+      "reihenfolge": 40,
+      "status": ""
+    },
+    {
+      "blatt": "6_Besonderheiten",
+      "bereich": "Besonderheiten",
+      "typ": "Checkbox",
+      "id": "verkuerzte_gliedmassen",
+      "anzeige": "Verkürzte Gliedmaßen",
+      "bericht": "Verkürzte Gliedmaßen",
+      "hinweis": "Arme oder Beine können verkürzt angelegt sein.",
+      "abhaengigkeit": "Wenn Besonderheiten vorhanden.",
+      "logik": "Hinweis klein/grau unter dem Namen; nicht im Bericht.",
+      "ausgabeart": "listenwert",
+      "satzgruppe": "besonderheiten_liste",
+      "reihenfolge": 50,
+      "status": ""
+    },
+    {
+      "blatt": "6_Besonderheiten",
+      "bereich": "Besonderheiten",
+      "typ": "Checkbox",
+      "id": "lippen_kiefer_gaumenspalte",
+      "anzeige": "Lippen-Kiefer-Gaumenspalte",
+      "bericht": "Lippen-Kiefer-Gaumenspalte",
+      "hinweis": "Spaltbildung im Bereich von Lippe, Kiefer und/oder Gaumen.",
+      "abhaengigkeit": "Wenn Besonderheiten vorhanden.",
+      "logik": "Hinweis klein/grau unter dem Namen; nicht im Bericht.",
+      "ausgabeart": "listenwert",
+      "satzgruppe": "besonderheiten_liste",
+      "reihenfolge": 60,
+      "status": ""
+    },
+    {
+      "blatt": "6_Besonderheiten",
+      "bereich": "Besonderheiten",
+      "typ": "Checkbox",
+      "id": "hydrocephalus",
+      "anzeige": "Hydrocephalus",
+      "bericht": "Hydrocephalus",
+      "hinweis": "Erweiterung der Hirnkammern / Wasserkopf.",
+      "abhaengigkeit": "Wenn Besonderheiten vorhanden.",
+      "logik": "Hinweis klein/grau unter dem Namen; nicht im Bericht.",
+      "ausgabeart": "listenwert",
+      "satzgruppe": "besonderheiten_liste",
+      "reihenfolge": 70,
+      "status": ""
+    },
+    {
+      "blatt": "6_Besonderheiten",
+      "bereich": "Besonderheiten",
+      "typ": "Checkbox",
+      "id": "hydrops_fetalis",
+      "anzeige": "Hydrops fetalis",
+      "bericht": "Hydrops fetalis",
+      "hinweis": "Starke Flüssigkeitseinlagerungen im Körper des Kindes.",
+      "abhaengigkeit": "Wenn Besonderheiten vorhanden.",
+      "logik": "Hinweis klein/grau unter dem Namen; nicht im Bericht.",
+      "ausgabeart": "listenwert",
+      "satzgruppe": "besonderheiten_liste",
+      "reihenfolge": 80,
+      "status": ""
+    },
+    {
+      "blatt": "6_Besonderheiten",
+      "bereich": "Besonderheiten",
+      "typ": "Checkbox",
+      "id": "omphalozele",
+      "anzeige": "Omphalozele",
+      "bericht": "Omphalozele",
+      "hinweis": "Bauchorgane liegen außerhalb der Bauchhöhle in einem Bruchsack.",
+      "abhaengigkeit": "Wenn Besonderheiten vorhanden.",
+      "logik": "Hinweis klein/grau unter dem Namen; nicht im Bericht.",
+      "ausgabeart": "listenwert",
+      "satzgruppe": "besonderheiten_liste",
+      "reihenfolge": 90,
+      "status": ""
+    },
+    {
+      "blatt": "6_Besonderheiten",
+      "bereich": "Besonderheiten",
+      "typ": "Checkbox",
+      "id": "turner_syndrom",
+      "anzeige": "Turner-Syndrom",
+      "bericht": "Turner-Syndrom",
+      "hinweis": "Chromosomale Besonderheit bei Mädchen.",
+      "abhaengigkeit": "Wenn Besonderheiten vorhanden.",
+      "logik": "Hinweis klein/grau unter dem Namen; nicht im Bericht.",
+      "ausgabeart": "listenwert",
+      "satzgruppe": "besonderheiten_liste",
+      "reihenfolge": 100,
+      "status": ""
+    },
+    {
+      "blatt": "6_Besonderheiten",
+      "bereich": "Besonderheiten",
+      "typ": "Checkbox",
+      "id": "spina_bifida",
+      "anzeige": "Spina bifida",
+      "bericht": "Spina bifida",
+      "hinweis": "Offener Rücken beziehungsweise Fehlbildung im Bereich der Wirbelsäule.",
+      "abhaengigkeit": "Wenn Besonderheiten vorhanden.",
+      "logik": "Hinweis klein/grau unter dem Namen; nicht im Bericht.",
+      "ausgabeart": "listenwert",
+      "satzgruppe": "besonderheiten_liste",
+      "reihenfolge": 110,
+      "status": ""
+    },
+    {
+      "blatt": "6_Besonderheiten",
+      "bereich": "Besonderheiten",
+      "typ": "Checkbox",
+      "id": "anenzephalie",
+      "anzeige": "Anenzephalie",
+      "bericht": "Anenzephalie",
+      "hinweis": "Schwere Fehlbildung, bei der große Teile von Gehirn und Schädel fehlen.",
+      "abhaengigkeit": "Wenn Besonderheiten vorhanden.",
+      "logik": "Hinweis klein/grau unter dem Namen; nicht im Bericht.",
+      "ausgabeart": "listenwert",
+      "satzgruppe": "besonderheiten_liste",
+      "reihenfolge": 120,
+      "status": ""
+    },
+    {
+      "blatt": "6_Besonderheiten",
+      "bereich": "Besonderheiten",
+      "typ": "Checkbox",
+      "id": "hautabloesungen",
+      "anzeige": "Hautablösungen erwartet",
+      "bericht": "Es sind Hautablösungen sichtbar.",
+      "hinweis": "",
+      "abhaengigkeit": "Wenn Besonderheiten vorhanden.",
+      "logik": "Separat ausgeben.",
+      "ausgabeart": "listenwert",
+      "satzgruppe": "besonderheiten_liste",
+      "reihenfolge": 130,
+      "status": ""
+    },
+    {
+      "blatt": "6_Besonderheiten",
+      "bereich": "Besonderheiten",
+      "typ": "Checkbox",
+      "id": "allgemeine_fehlbildungen",
+      "anzeige": "Allgemeine äußerliche Fehlbildungen",
+      "bericht": "Es liegen allgemeine äußerliche Fehlbildungen vor.",
+      "hinweis": "",
+      "abhaengigkeit": "Wenn Besonderheiten vorhanden.",
+      "logik": "Separat ausgeben.",
+      "ausgabeart": "listenwert",
+      "satzgruppe": "besonderheiten_liste",
+      "reihenfolge": 140,
+      "status": ""
+    },
+    {
+      "blatt": "6_Besonderheiten",
+      "bereich": "Besonderheiten",
+      "typ": "Checkbox",
+      "id": "fehlbildungen_innerer_art",
+      "anzeige": "Fehlbildungen innerer Art",
+      "bericht": "Es liegen Fehlbildungen innerer Art vor.",
+      "hinweis": "",
+      "abhaengigkeit": "Wenn Besonderheiten vorhanden.",
+      "logik": "Separat ausgeben.",
+      "ausgabeart": "listenwert",
+      "satzgruppe": "besonderheiten_liste",
+      "reihenfolge": 150,
+      "status": ""
+    },
+    {
+      "blatt": "7_Kleidung",
+      "bereich": "Kleidung",
+      "typ": "Checkbox",
+      "id": "kleidung_vorhanden",
+      "anzeige": "Kleidung vorhanden",
+      "bericht": "Kleidung ist vorhanden.",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "Singular; exclude:kleidung_nicht_vorhanden",
+      "ausgabeart": "direkt",
+      "satzgruppe": "kleidung",
+      "reihenfolge": 10,
+      "status": ""
+    },
+    {
+      "blatt": "7_Kleidung",
+      "bereich": "Kleidung",
+      "typ": "Checkbox",
+      "id": "kleidung_nicht_vorhanden",
+      "anzeige": "Kleidung nicht vorhanden",
+      "bericht": "Kleidung ist nicht vorhanden.",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "Singular;exclude:kleidung_vorhanden",
+      "ausgabeart": "direkt",
+      "satzgruppe": "kleidung",
+      "reihenfolge": 20,
+      "status": ""
+    },
+    {
+      "blatt": "7_Kleidung",
+      "bereich": "Kleidung",
+      "typ": "Checkbox",
+      "id": "deckchen_vorhanden",
+      "anzeige": "Deckchen vorhanden",
+      "bericht": "Deckchen sind vorhanden.",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "Plural; exclude:keine_deckchen",
+      "ausgabeart": "direkt",
+      "satzgruppe": "kleidung",
+      "reihenfolge": 30,
+      "status": ""
+    },
+    {
+      "blatt": "7_Kleidung",
+      "bereich": "Kleidung",
+      "typ": "Checkbox",
+      "id": "deckchen_nicht_vorhanden",
+      "anzeige": "Deckchen nicht vorhanden",
+      "bericht": "Deckchen sind nicht vorhanden.",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "Plural.",
+      "ausgabeart": "auslassen",
+      "satzgruppe": "kleidung",
+      "reihenfolge": 40,
+      "status": "löschen"
+    },
+    {
+      "blatt": "7_Kleidung",
+      "bereich": "Kleidung",
+      "typ": "Checkbox",
+      "id": "einschlagtuecher_vorhanden",
+      "anzeige": "Einschlagtücher vorhanden",
+      "bericht": "Einschlagtücher sind vorhanden.",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "Plural; exclude:keine_deckchen",
+      "ausgabeart": "direkt",
+      "satzgruppe": "kleidung",
+      "reihenfolge": 50,
+      "status": ""
+    },
+    {
+      "blatt": "7_Kleidung",
+      "bereich": "Kleidung",
+      "typ": "Checkbox",
+      "id": "einschlagtuecher_nicht_vorhanden",
+      "anzeige": "Einschlagtücher nicht vorhanden",
+      "bericht": "Einschlagtücher sind nicht vorhanden.",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "Plural.",
+      "ausgabeart": "auslassen",
+      "satzgruppe": "kleidung",
+      "reihenfolge": 60,
+      "status": "löschen"
+    },
+    {
+      "blatt": "7_Kleidung",
+      "bereich": "Kleidung",
+      "typ": "Checkbox",
+      "id": "decke",
+      "anzeige": "Eltern bringen eine Decke mit",
+      "bericht": "eine Decke",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "Mit anderen Eltern-bringen-mit-Objekten zusammenfassen.",
+      "ausgabeart": "sammelwert",
+      "satzgruppe": "eltern_bringen_mit",
+      "reihenfolge": 70,
+      "status": ""
+    },
+    {
+      "blatt": "7_Kleidung",
+      "bereich": "Kleidung",
+      "typ": "Checkbox",
+      "id": "erinnerungsstuecke",
+      "anzeige": "Eltern bringen Erinnerungsstücke mit",
+      "bericht": "Erinnerungsstücke",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "Mit anderen Eltern-bringen-mit-Objekten zusammenfassen.",
+      "ausgabeart": "sammelwert",
+      "satzgruppe": "eltern_bringen_mit",
+      "reihenfolge": 80,
+      "status": ""
+    },
+    {
+      "blatt": "7_Kleidung",
+      "bereich": "Kleidung",
+      "typ": "Checkbox",
+      "id": "kuscheltiere",
+      "anzeige": "Eltern bringen Kuscheltiere mit",
+      "bericht": "Kuscheltiere",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "Mit anderen Eltern-bringen-mit-Objekten zusammenfassen.",
+      "ausgabeart": "sammelwert",
+      "satzgruppe": "eltern_bringen_mit",
+      "reihenfolge": 90,
+      "status": ""
+    },
+    {
+      "blatt": "7_Kleidung",
+      "bereich": "Kleidung",
+      "typ": "Checkbox",
+      "id": "eigene_kleidung",
+      "anzeige": "Eltern bringen Kleidung mit",
+      "bericht": "eigene Kleidung für {kindbezug}",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "Bei Mehrlingen: eigene Kleidung für ihre Kinder.",
+      "ausgabeart": "sammelwert",
+      "satzgruppe": "eltern_bringen_mit",
+      "reihenfolge": 100,
+      "status": ""
+    },
+    {
+      "blatt": "7_Kleidung",
+      "bereich": "Kleidung",
+      "typ": "Checkbox",
+      "id": "keine_Deckchen",
+      "anzeige": "Keine Deckchen vorhanden",
+      "bericht": "Es sind keine Einschlagtücher oder Deckchen vorhanden, bringt gerne was schönes mit. ",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "exclude:deckchen_vorhanden,einschlagtuecher_vorhanden",
+      "ausgabeart": "direkt",
+      "satzgruppe": "kleidung",
+      "reihenfolge": 110,
+      "status": "neu"
+    },
+    {
+      "blatt": "8_Erinnerungen_Bilder",
+      "bereich": "Erinnerungen/Bilder",
+      "typ": "Checkbox",
+      "id": "gemeinsame_bilder_kind",
+      "anzeige": "Die Eltern möchten gemeinsame Erinnerungsbilder mit ihrem Kind.",
+      "bericht": "Die Eltern möchten bei den Bildern dabei sein.",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "Bei Mehrlingen anpassen.",
+      "ausgabeart": "auslassen",
+      "satzgruppe": "bilder_familie",
+      "reihenfolge": 10,
+      "status": "löschen"
+    },
+    {
+      "blatt": "8_Erinnerungen_Bilder",
+      "bereich": "Erinnerungen/Bilder",
+      "typ": "Checkbox",
+      "id": "gemeinsame_bilder_gewuenscht",
+      "anzeige": "Gemeinsame Bilder gewünscht.",
+      "bericht": "Die Eltern möchten bei den Bildern dabei sein. ",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "Bei Mehrlingen anpassen; exclude:eltern_bilder_unklar,gemeinsame_bilder_unklar",
+      "ausgabeart": "direkt",
+      "satzgruppe": "bilder_familie",
+      "reihenfolge": 20,
+      "status": "umbau"
+    },
+    {
+      "blatt": "8_Erinnerungen_Bilder",
+      "bereich": "Erinnerungen/Bilder",
+      "typ": "Checkbox",
+      "id": "geschwister_vermutlich",
+      "anzeige": "Geschwister vermutlich mit auf die Bilder.",
+      "bericht": "Die Geschwister werden bei den Bildern dabei sein. ",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "",
+      "ausgabeart": "direkt",
+      "satzgruppe": "bilder_familie",
+      "reihenfolge": 30,
+      "status": "umbau"
+    },
+    {
+      "blatt": "8_Erinnerungen_Bilder",
+      "bereich": "Erinnerungen/Bilder",
+      "typ": "Checkbox",
+      "id": "eltern_bilder_unklar",
+      "anzeige": "Eltern auf Bildern unklar.",
+      "bericht": "Ob die Eltern mit auf die Bilder möchten, ist aktuell nicht bekannt.",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "",
+      "ausgabeart": "direkt",
+      "satzgruppe": "bilder_unklar",
+      "reihenfolge": 40,
+      "status": "umbau"
+    },
+    {
+      "blatt": "8_Erinnerungen_Bilder",
+      "bereich": "Erinnerungen/Bilder",
+      "typ": "Checkbox",
+      "id": "geschwister_bilder_unklar",
+      "anzeige": "Geschwister auf Bildern unklar.",
+      "bericht": "Ob die Geschwister mit auf die Bilder möchten, ist aktuell nicht bekannt.",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "",
+      "ausgabeart": "direkt",
+      "satzgruppe": "bilder_unklar",
+      "reihenfolge": 50,
+      "status": "umbau"
+    },
+    {
+      "blatt": "8_Erinnerungen_Bilder",
+      "bereich": "Erinnerungen/Bilder",
+      "typ": "Checkbox",
+      "id": "gemeinsame_bilder_unklar",
+      "anzeige": "Gemeinsame Bilder unklar.",
+      "bericht": "Ob gemeinsame Bilder mit der Familie gewünscht sind, ist aktuell nicht bekannt.",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "",
+      "ausgabeart": "direkt",
+      "satzgruppe": "bilder_unklar",
+      "reihenfolge": 60,
+      "status": "umbau"
+    },
+    {
+      "blatt": "8_Erinnerungen_Bilder",
+      "bereich": "Erinnerungen/Bilder",
+      "typ": "Checkbox",
+      "id": "bilder_morgen",
+      "anzeige": "Bilder auch morgen möglich.",
+      "bericht": "Bilder sind auch morgen noch möglich.",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "exclude:bilder_heute",
+      "ausgabeart": "direkt",
+      "satzgruppe": "bilder_zeitfenster",
+      "reihenfolge": 70,
+      "status": "umbau"
+    },
+    {
+      "blatt": "8_Erinnerungen_Bilder",
+      "bereich": "Erinnerungen/Bilder",
+      "typ": "Checkbox",
+      "id": "bilder_heute",
+      "anzeige": "Bilder nur heute möglich.",
+      "bericht": "Bilder sind nur heute möglich.",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "exclude:bilder_morgen",
+      "ausgabeart": "direkt",
+      "satzgruppe": "bilder_zeitfenster",
+      "reihenfolge": 80,
+      "status": "umbau"
+    },
+    {
+      "blatt": "8_Erinnerungen_Bilder",
+      "bereich": "Erinnerungen/Bilder",
+      "typ": "Checkbox",
+      "id": "eltern_nach_hause",
+      "anzeige": "Eltern möchten zeitnah nach Hause gehen.",
+      "bericht": "Die Eltern möchten zeitnah nach Hause gehen.",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "",
+      "ausgabeart": "direkt",
+      "satzgruppe": "bilder_familie",
+      "reihenfolge": 90,
+      "status": ""
+    },
+    {
+      "blatt": "8_Erinnerungen_Bilder",
+      "bereich": "Erinnerungen/Bilder",
+      "typ": "Radio",
+      "id": "bilder_einling",
+      "anzeige": "Einling",
+      "bericht": "mit ihrem Kind",
+      "hinweis": "",
+      "abhaengigkeit": "Wenn gemeinsame Bilder aktiviert.",
+      "logik": "Nicht im Bericht einzeln ausgeben, nur Satz anpassen.",
+      "ausgabeart": "steuerwert",
+      "satzgruppe": "bildbezug",
+      "reihenfolge": 100,
+      "status": "löschen"
+    },
+    {
+      "blatt": "8_Erinnerungen_Bilder",
+      "bereich": "Erinnerungen/Bilder",
+      "typ": "Radio",
+      "id": "bilder_zwillinge",
+      "anzeige": "Zwillinge",
+      "bericht": "mit den Zwillingen",
+      "hinweis": "",
+      "abhaengigkeit": "Wenn gemeinsame Bilder aktiviert.",
+      "logik": "Nicht im Bericht einzeln ausgeben, nur Satz anpassen.",
+      "ausgabeart": "steuerwert",
+      "satzgruppe": "bildbezug",
+      "reihenfolge": 110,
+      "status": "löschen"
+    },
+    {
+      "blatt": "8_Erinnerungen_Bilder",
+      "bereich": "Erinnerungen/Bilder",
+      "typ": "Radio",
+      "id": "bilder_drillinge",
+      "anzeige": "Drillinge",
+      "bericht": "mit den Drillingen",
+      "hinweis": "",
+      "abhaengigkeit": "Wenn gemeinsame Bilder aktiviert.",
+      "logik": "Nicht im Bericht einzeln ausgeben, nur Satz anpassen.",
+      "ausgabeart": "steuerwert",
+      "satzgruppe": "bildbezug",
+      "reihenfolge": 120,
+      "status": "löschen"
+    },
+    {
+      "blatt": "8_Erinnerungen_Bilder",
+      "bereich": "Erinnerungen/Bilder",
+      "typ": "Radio",
+      "id": "bilder_mehrlinge",
+      "anzeige": "Mehrlinge",
+      "bericht": "mit ihren Kindern",
+      "hinweis": "",
+      "abhaengigkeit": "Wenn gemeinsame Bilder aktiviert.",
+      "logik": "Nicht im Bericht einzeln ausgeben, nur Satz anpassen.",
+      "ausgabeart": "steuerwert",
+      "satzgruppe": "bildbezug",
+      "reihenfolge": 130,
+      "status": "löschen"
+    },
+    {
+      "blatt": "9_Wassermethode",
+      "bereich": "Wassermethode",
+      "typ": "Hinweis",
+      "id": "wasser_nicht_freiburg_muenster",
+      "anzeige": "Unikliniken Freiburg und Münster bitte nicht nach der Wassermethode fragen.",
+      "bericht": "",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "Interner Hinweis, nicht Bericht.",
+      "ausgabeart": "hinweis",
+      "satzgruppe": "wassermethode_hinweis",
+      "reihenfolge": 10,
+      "status": ""
+    },
+    {
+      "blatt": "9_Wassermethode",
+      "bereich": "Wassermethode",
+      "typ": "Hinweis",
+      "id": "wasser_anwendung",
+      "anzeige": "Anwendung Wassermethode",
+      "bericht": "",
+      "hinweis": "Ein Gefäß mit kühlem Leitungswasser befüllen. Das Kind hineinlegen und kühl stellen. Bei Bedarf Wasser wechseln.Die Wassermethode kann helfen, die Haut zu stabilisieren.",
+      "abhaengigkeit": "",
+      "logik": "Interner Hinweis, nicht Bericht.",
+      "ausgabeart": "hinweis",
+      "satzgruppe": "wassermethode_hinweis",
+      "reihenfolge": 20,
+      "status": ""
+    },
+    {
+      "blatt": "9_Wassermethode",
+      "bereich": "Wassermethode",
+      "typ": "Dropdown",
+      "id": "wasser_ja",
+      "anzeige": "Wird angewendet",
+      "bericht": "Das Sternchen liegt im Wasser und wartet auf seinen Fotografen. ",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "Bei mehreren verstorbenen Kindern → „Die Sternchen liegen im Wasser ...“",
+      "ausgabeart": "direkt",
+      "satzgruppe": "wassermethode_status",
+      "reihenfolge": 30,
+      "status": ""
+    },
+    {
+      "blatt": "9_Wassermethode",
+      "bereich": "Wassermethode",
+      "typ": "Dropdown",
+      "id": "wasser_nein",
+      "anzeige": "Wird nicht angewendet",
+      "bericht": "Die Wassermethode wird nicht angewendet.",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "",
+      "ausgabeart": "direkt",
+      "satzgruppe": "wassermethode_status",
+      "reihenfolge": 40,
+      "status": "umbau"
+    },
+    {
+      "blatt": "9_Wassermethode",
+      "bereich": "Wassermethode",
+      "typ": "Dropdown",
+      "id": "wasser_unbekannt",
+      "anzeige": "Weiß man noch nicht",
+      "bericht": "Ob die Wassermethode angewendet wird, ist aktuell nicht bekannt.",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "",
+      "ausgabeart": "direkt",
+      "satzgruppe": "wassermethode_status",
+      "reihenfolge": 50,
+      "status": "umbau"
+    },
+    {
+      "blatt": "9_Wassermethode",
+      "bereich": "Wassermethode",
+      "typ": "Checkbox",
+      "id": "wasser_erklaert",
+      "anzeige": "Wassermethode erklärt",
+      "bericht": "Ich habe die Wassermethode erklärt.",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "Neu aufgenommen.",
+      "ausgabeart": "direkt",
+      "satzgruppe": "wassermethode_zusatz",
+      "reihenfolge": 60,
+      "status": ""
+    },
+    {
+      "blatt": "9_Wassermethode",
+      "bereich": "Wassermethode",
+      "typ": "Dropdown",
+      "id": "wasser_nach_geburt",
+      "anzeige": "Wassermethode bei Einleitung",
+      "bericht": "Das Kind wird nach der Geburt ins Wasser gelegt.",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "Bei mehreren verstorbenen Kindern → „Die Kinder werden nach der Geburt.....“",
+      "ausgabeart": "direkt",
+      "satzgruppe": "wassermethode_status",
+      "reihenfolge": 30,
+      "status": "neu"
+    },
+    {
+      "blatt": "10_Kommunikation",
+      "bereich": "Kommunikation",
+      "typ": "Checkbox",
+      "id": "kein_deutsch",
+      "anzeige": "Kein Deutsch",
+      "bericht": "Die Eltern sprechen kein Deutsch.",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "",
+      "ausgabeart": "direkt",
+      "satzgruppe": "kommunikation_sprache",
+      "reihenfolge": 10,
+      "status": ""
+    },
+    {
+      "blatt": "10_Kommunikation",
+      "bereich": "Kommunikation",
+      "typ": "Checkbox",
+      "id": "wenig_deutsch",
+      "anzeige": "Wenig Deutsch",
+      "bericht": "Die Eltern sprechen wenig Deutsch.",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "",
+      "ausgabeart": "direkt",
+      "satzgruppe": "kommunikation_sprache",
+      "reihenfolge": 20,
+      "status": ""
+    },
+    {
+      "blatt": "10_Kommunikation",
+      "bereich": "Kommunikation",
+      "typ": "Checkbox",
+      "id": "englisch_moeglich",
+      "anzeige": "Englisch möglich",
+      "bericht": "Die Kommunikation auf Englisch ist gut möglich.",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "",
+      "ausgabeart": "direkt",
+      "satzgruppe": "kommunikation_sprache",
+      "reihenfolge": 30,
+      "status": ""
+    },
+    {
+      "blatt": "10_Kommunikation",
+      "bereich": "Kommunikation",
+      "typ": "Checkbox",
+      "id": "kommunikation_schwierig",
+      "anzeige": "Kommunikation schwierig",
+      "bericht": "Die Kommunikation gestaltet sich aktuell schwierig.",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "",
+      "ausgabeart": "direkt",
+      "satzgruppe": "kommunikation_sprache",
+      "reihenfolge": 40,
+      "status": ""
+    },
+    {
+      "blatt": "10_Kommunikation",
+      "bereich": "Kommunikation",
+      "typ": "Checkbox",
+      "id": "uebersetzungsprogramm",
+      "anzeige": "Übersetzungsprogramm funktioniert gut",
+      "bericht": "Die Verständigung mit einem Übersetzungsprogramm funktioniert gut.",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "",
+      "ausgabeart": "direkt",
+      "satzgruppe": "kommunikation_sprache",
+      "reihenfolge": 50,
+      "status": ""
+    },
+    {
+      "blatt": "10_Kommunikation",
+      "bereich": "Kommunikation",
+      "typ": "Freitext",
+      "id": "kommunikation_freitext",
+      "anzeige": "Ergänzung",
+      "bericht": "{Freitext}",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "Optionaler eigener Satz.",
+      "ausgabeart": "auslassen",
+      "satzgruppe": "kommunikation_freitext",
+      "reihenfolge": 60,
+      "status": "löschen"
+    },
+    {
+      "blatt": "11_Infekte",
+      "bereich": "Infekte",
+      "typ": "Dropdown",
+      "id": "keine_infekte",
+      "anzeige": "Keine Infekte bekannt",
+      "bericht": "Es sind keine Infekte bekannt.",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "",
+      "ausgabeart": "direkt",
+      "satzgruppe": "infekte_status",
+      "reihenfolge": 10,
+      "status": ""
+    },
+    {
+      "blatt": "11_Infekte",
+      "bereich": "Infekte",
+      "typ": "Dropdown",
+      "id": "infekte_vorhanden",
+      "anzeige": "Infekte vorhanden",
+      "bericht": "Infekte: ",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "Zeigt Infektliste.",
+      "ausgabeart": "steuerwert",
+      "satzgruppe": "infekte_status",
+      "reihenfolge": 20,
+      "status": "umbau"
+    },
+    {
+      "blatt": "11_Infekte",
+      "bereich": "Infekte",
+      "typ": "Dropdown",
+      "id": "infekte_unklar",
+      "anzeige": "Unklar",
+      "bericht": "Ob Infekte vorliegen, ist aktuell nicht bekannt.",
+      "hinweis": "",
+      "abhaengigkeit": "",
+      "logik": "",
+      "ausgabeart": "direkt",
+      "satzgruppe": "infekte_status",
+      "reihenfolge": 30,
+      "status": "umbau"
+    },
+    {
+      "blatt": "11_Infekte",
+      "bereich": "Infekte",
+      "typ": "Checkbox",
+      "id": "corona",
+      "anzeige": "Corona",
+      "bericht": "Corona",
+      "hinweis": "",
+      "abhaengigkeit": "Wenn Infekte vorhanden.",
+      "logik": "Im Bericht untereinander.",
+      "ausgabeart": "listenwert",
+      "satzgruppe": "infekte_liste",
+      "reihenfolge": 40,
+      "status": ""
+    },
+    {
+      "blatt": "11_Infekte",
+      "bereich": "Infekte",
+      "typ": "Checkbox",
+      "id": "hepatitis",
+      "anzeige": "Hepatitis",
+      "bericht": "Hepatitis",
+      "hinweis": "",
+      "abhaengigkeit": "Wenn Infekte vorhanden.",
+      "logik": "Im Bericht untereinander.",
+      "ausgabeart": "listenwert",
+      "satzgruppe": "infekte_liste",
+      "reihenfolge": 50,
+      "status": ""
+    },
+    {
+      "blatt": "11_Infekte",
+      "bereich": "Infekte",
+      "typ": "Checkbox",
+      "id": "mrsa",
+      "anzeige": "MRSA Krankenhauskeim",
+      "bericht": "MRSA Krankenhauskeim",
+      "hinweis": "",
+      "abhaengigkeit": "Wenn Infekte vorhanden.",
+      "logik": "Im Bericht untereinander.",
+      "ausgabeart": "listenwert",
+      "satzgruppe": "infekte_liste",
+      "reihenfolge": 60,
+      "status": ""
+    },
+    {
+      "blatt": "11_Infekte",
+      "bereich": "Infekte",
+      "typ": "Checkbox",
+      "id": "hiv",
+      "anzeige": "HIV",
+      "bericht": "HIV",
+      "hinweis": "",
+      "abhaengigkeit": "Wenn Infekte vorhanden.",
+      "logik": "Im Bericht untereinander.",
+      "ausgabeart": "listenwert",
+      "satzgruppe": "infekte_liste",
+      "reihenfolge": 70,
+      "status": ""
+    },
+    {
+      "blatt": "11_Infekte",
+      "bereich": "Infekte",
+      "typ": "Checkbox",
+      "id": "influenza",
+      "anzeige": "Influenza",
+      "bericht": "Influenza",
+      "hinweis": "",
+      "abhaengigkeit": "Wenn Infekte vorhanden.",
+      "logik": "Im Bericht untereinander.",
+      "ausgabeart": "listenwert",
+      "satzgruppe": "infekte_liste",
+      "reihenfolge": 80,
+      "status": ""
+    },
+    {
+      "blatt": "11_Infekte",
+      "bereich": "Infekte",
+      "typ": "Checkbox",
+      "id": "schutzkleidung",
+      "anzeige": "Schutzkleidung vorhanden",
+      "bericht": "Schutzkleidung ist vorhanden.",
+      "hinweis": "",
+      "abhaengigkeit": "Wenn Infekte vorhanden.",
+      "logik": "Separat ausgeben.",
+      "ausgabeart": "direkt",
+      "satzgruppe": "infekte_liste",
+      "reihenfolge": 90,
+      "status": ""
+    }
+  ]
+};
+
+
+// =========================================================
+// Ergänzung: Mehrlingssituation sichtbar machen
+// (wird nur ergänzt, wenn diese Gruppe im JSON noch fehlt)
+// =========================================================
+if (!BASIS.karten.some(k => k.satzgruppe === 'mehrlingssituation')) {
+  BASIS.karten.push(
+    {
+      blatt: '5_Aktuelle_Situation', bereich: 'Aktuelle Situation', typ: 'Radio',
+      id: 'zwillinge_beide_verstorben', anzeige: 'Zwillinge – beide Kinder verstorben',
+      bericht: 'Es handelt sich um Zwillinge, beide Kinder sind verstorben.',
+      hinweis: '', abhaengigkeit: '', logik: 'Mehrlingssituation, sichtbar in Karte 5.',
+      ausgabeart: 'direkt', satzgruppe: 'mehrlingssituation', reihenfolge: 191, status: ''
+    },
+    {
+      blatt: '5_Aktuelle_Situation', bereich: 'Aktuelle Situation', typ: 'Radio',
+      id: 'zwillinge_ein_kind_verstorben', anzeige: 'Zwillinge – ein Kind verstorben, ein Kind lebt / kritisch',
+      bericht: 'Es handelt sich um Zwillinge, ein Kind ist verstorben, das andere Kind lebt beziehungsweise befindet sich noch in Behandlung.',
+      hinweis: '', abhaengigkeit: '', logik: 'Mehrlingssituation, sichtbar in Karte 5.',
+      ausgabeart: 'direkt', satzgruppe: 'mehrlingssituation', reihenfolge: 192, status: ''
+    },
+    {
+      blatt: '5_Aktuelle_Situation', bereich: 'Aktuelle Situation', typ: 'Radio',
+      id: 'zwillinge_beide_kritisch', anzeige: 'Zwillinge – beide Kinder kritisch',
+      bericht: 'Es handelt sich um Zwillinge, beide Kinder befinden sich in einer kritischen Situation.',
+      hinweis: '', abhaengigkeit: '', logik: 'Mehrlingssituation, sichtbar in Karte 5.',
+      ausgabeart: 'direkt', satzgruppe: 'mehrlingssituation', reihenfolge: 193, status: ''
+    },
+    {
+      blatt: '5_Aktuelle_Situation', bereich: 'Aktuelle Situation', typ: 'Radio',
+      id: 'mehrlinge_unterschiedliche_situation', anzeige: 'Mehrlinge – unterschiedliche Situation der Kinder',
+      bericht: 'Es handelt sich um eine Mehrlingssituation mit unterschiedlicher Situation der Kinder.',
+      hinweis: '', abhaengigkeit: '', logik: 'Mehrlingssituation, sichtbar in Karte 5.',
+      ausgabeart: 'direkt', satzgruppe: 'mehrlingssituation', reihenfolge: 194, status: ''
+    }
+  );
+}
+
+// =========================================================
+// Grundstruktur
+// =========================================================
+const BLATT_ORDER = [
+  '0_Adressänderungen',
+  '1_Begrüßung',
+  '2_Ansprechpartner',
+  '3_Lebendbilder',
+  '4_Einleitung',
+  '5_Aktuelle_Situation',
+  '6_Besonderheiten',
+  '7_Kleidung',
+  '8_Erinnerungen_Bilder',
+  '9_Wassermethode',
+  '10_Kommunikation',
+  '11_Infekte'
+];
+
+function blattSortIndex(blatt) {
+  const index = BLATT_ORDER.indexOf(String(blatt || ''));
+  return index >= 0 ? index : 999;
+}
+
+const karten = BASIS.karten
+  .filter(k => String(k.status || '').toLowerCase() !== 'löschen')
+  .sort((a,b) => blattSortIndex(a.blatt) - blattSortIndex(b.blatt) || (Number(a.reihenfolge)||0) - (Number(b.reihenfolge)||0));
+
+const byId = Object.fromEntries(karten.map(k => [k.id, k]));
+const byBlatt = groupBy(karten, k => k.blatt);
+
+function groupBy(arr, fn) {
+  return arr.reduce((acc, item) => {
+    const key = fn(item) || 'Sonstiges';
+    (acc[key] ||= []).push(item);
+    return acc;
+  }, {});
+}
+
+function niceBlatt(blatt) {
+  return String(blatt).replace(/^\d+_?/, '').replaceAll('_', ' ');
+}
+
+function labelForGroup(satzgruppe) {
+  const map = {
+    begruessung:'Begrüßung',
+    abschlussfrage:'Abschlussfrage',
+    grussformel:'Grußformel',
+    ansprechpartner_rolle:'Rolle',
+    ansprechpartner_beschreibung:'Beschreibung',
+    ansprechpartner_gespraechsart:'Gesprächsart',
+    lebendbilder_geburt:'Geburt',
+    lebendbilder_alter:'Alter / SSW',
+    lebendbilder_prognose:'Prognose / Situation',
+    einleitung_status:'Status',
+    einleitung_zeit:'Zeit / Dauer',
+    einleitung_erwartung:'Erwartung',
+    kindfolge:'Kind der Familie',
+    kinder_an_der_hand:'Kinder an der Hand',
+    mehrlingsstatus:'Einling / Mehrlinge',
+    mehrlingssituation:'Mehrlingssituation',
+    familienstruktur:'Familienstruktur',
+    aktuelle_situation_status:'Aktuelle Lage',
+    besonderheiten_status:'Status',
+    besonderheiten_liste:'Besonderheiten',
+    kleidung:'Kleidung',
+    eltern_bringen_mit:'Eltern bringen mit',
+    bilder_familie:'Familienbilder',
+    bilder_unklar:'Unklarheiten',
+    bilder_zeitfenster:'Zeitfenster',
+    bildbezug:'Bildbezug',
+    wassermethode_hinweis:'Hinweise',
+    wassermethode_status:'Wassermethode',
+    wassermethode_zusatz:'Zusatz',
+    kommunikation_sprache:'Sprache / Kommunikation',
+    infekte_status:'Status',
+    infekte_liste:'Infekte'
+  };
+  return map[satzgruppe] || String(satzgruppe || 'Auswahl').replaceAll('_',' ');
+}
+
+function controlNameFor(k) {
+  return 'ctrl_' + k.satzgruppe;
+}
+
+function isControlOnly(k) {
+  return ['steuerwert','regel','hinweis','vorschlag'].includes(k.ausgabeart);
+}
+
+// =========================================================
+// UI aus JSON bauen
+// =========================================================
+
+function selectForGroup(group, items, placeholder) {
+  const sel = document.createElement('select');
+  sel.dataset.group = group;
+  const empty = document.createElement('option');
+  empty.value = '';
+  empty.textContent = placeholder || '– bitte auswählen –';
+  sel.appendChild(empty);
+  items.forEach(item => {
+    const opt = document.createElement('option');
+    opt.value = item.id;
+    opt.textContent = item.anzeige || item.id;
+    sel.appendChild(opt);
+  });
+  sel.addEventListener('change', aktualisieren);
+  return sel;
+}
+
+
+
+function renderAdresseSpezial(items, content) {
+  const labels = {
+    adresse_klinik: 'Klinik',
+    adresse_strasse: 'Straße',
+    adresse_hausnummer: 'Hausnummer',
+    adresse_plz: 'PLZ',
+    adresse_ort: 'Ort'
+  };
+
+  ['adresse_klinik','adresse_strasse','adresse_hausnummer','adresse_plz','adresse_ort'].forEach(id => {
+    const field = document.createElement('div');
+    field.className = 'field';
+    field.innerHTML = `<label class="field-title" for="${id}">${labels[id]}</label><input type="text" id="${id}" placeholder="">`;
+    content.appendChild(field);
+  });
+
+  const regionField = document.createElement('div');
+  regionField.className = 'field';
+  regionField.innerHTML = '<label class="field-title" for="adresse_region">Bundesland / Kanton</label>';
+
+  const select = document.createElement('select');
+  select.id = 'adresse_region';
+  select.dataset.satzgruppe = 'adressdaten';
+  select.dataset.blatt = '0_Adressänderungen';
+
+  const empty = document.createElement('option');
+  empty.value = '';
+  empty.textContent = '– bitte auswählen –';
+  select.appendChild(empty);
+
+  const gruppen = {
+    'Deutschland': ['Baden-Württemberg','Bayern','Berlin','Brandenburg','Bremen','Hamburg','Hessen','Mecklenburg-Vorpommern','Niedersachsen','Nordrhein-Westfalen','Rheinland-Pfalz','Saarland','Sachsen','Sachsen-Anhalt','Schleswig-Holstein','Thüringen'],
+    'Schweiz': ['Aargau','Appenzell Ausserrhoden','Appenzell Innerrhoden','Basel-Landschaft','Basel-Stadt','Bern','Freiburg','Genf','Glarus','Graubünden','Jura','Luzern','Neuenburg','Nidwalden','Obwalden','Schaffhausen','Schwyz','Solothurn','St. Gallen','Tessin','Thurgau','Uri','Waadt','Wallis','Zug','Zürich'],
+    'Österreich': ['Burgenland','Kärnten','Niederösterreich','Oberösterreich','Salzburg','Steiermark','Tirol','Vorarlberg','Wien']
+  };
+
+  Object.entries(gruppen).forEach(([land, werte]) => {
+    const group = document.createElement('optgroup');
+    group.label = land;
+    werte.forEach(wert => {
+      const opt = document.createElement('option');
+      opt.value = wert;
+      opt.textContent = wert;
+      group.appendChild(opt);
+    });
+    select.appendChild(group);
+  });
+
+  regionField.appendChild(select);
+  content.appendChild(regionField);
+}
+
+
+function renderLebendbilderSpezial(items, content) {
+  const geburt = items
+    .filter(x => x.satzgruppe === 'lebendbilder_geburt' && x.typ === 'Dropdown')
+    .sort((a,b) => (a.reihenfolge || 0) - (b.reihenfolge || 0));
+
+  const alterseinheit = items
+    .filter(x => x.satzgruppe === 'lebendbilder_alter' && x.typ === 'Dropdown')
+    .sort((a,b) => (a.reihenfolge || 0) - (b.reihenfolge || 0));
+
+  const prognose = items
+    .filter(x => x.satzgruppe === 'lebendbilder_prognose' && x.typ === 'Dropdown')
+    .sort((a,b) => (a.reihenfolge || 0) - (b.reihenfolge || 0));
+
+  const intro = document.createElement('p');
+  intro.className = 'internal';
+  intro.textContent = 'Ruhige, klare Sätze zur Situation des Kindes.';
+  content.appendChild(intro);
+
+  const geburtField = document.createElement('div');
+  geburtField.className = 'field';
+  geburtField.innerHTML = '<label class="field-title">Geburt / Zeitraum</label>';
+  geburtField.appendChild(selectForGroup('lebendbilder_geburt', geburt, '– bitte auswählen –'));
+  content.appendChild(geburtField);
+
+  const row = document.createElement('div');
+  row.className = 'field-row';
+
+  const sswField = document.createElement('div');
+  sswField.className = 'field';
+  sswField.innerHTML = '<label class="field-title">SSW</label><input type="text" id="ssw" placeholder="z. B. 24">';
+  row.appendChild(sswField);
+
+  const alterField = document.createElement('div');
+  alterField.className = 'field';
+  alterField.innerHTML = '<label class="field-title">Alter</label><input type="text" id="alter_zahl" placeholder="z. B. 2">';
+  row.appendChild(alterField);
+
+  content.appendChild(row);
+
+  const einheitField = document.createElement('div');
+  einheitField.className = 'field';
+  einheitField.innerHTML = '<label class="field-title">Alterseinheit</label>';
+  einheitField.appendChild(selectForGroup('lebendbilder_alter', alterseinheit, '– bitte auswählen –'));
+  content.appendChild(einheitField);
+
+  const prognoseField = document.createElement('div');
+  prognoseField.className = 'field';
+  prognoseField.innerHTML = '<label class="field-title">Prognose / medizinische Situation</label>';
+  prognoseField.appendChild(selectForGroup('lebendbilder_prognose', prognose, '– bitte auswählen –'));
+  content.appendChild(prognoseField);
+
+  const ergaenzungField = document.createElement('div');
+  ergaenzungField.className = 'field';
+  ergaenzungField.innerHTML = '<label class="field-title">Ergänzung</label><textarea id="lebendbilder_ergaenzung" placeholder="Eigene Ergänzung ..."></textarea>';
+  content.appendChild(ergaenzungField);
+}
+
+
+
+function render() {
+  document.getElementById('profilInfo').innerText = `${BASIS.profil} / ${BASIS.exportiertAm}`;
+  const root = document.getElementById('kartenbereich');
+  root.innerHTML = '';
+
+  Object.entries(byBlatt).forEach(([blatt, items], index) => {
+    const details = document.createElement('details');
+    details.className = 'card';
+    details.dataset.blatt = blatt;
+
+    const summary = document.createElement('summary');
+    summary.innerHTML = `<span>${niceBlatt(blatt)}</span><span class="toggle-hint">öffnen</span>`;
+    details.appendChild(summary);
+
+    const content = document.createElement('div');
+    content.className = 'content';
+    if (blatt === '0_Adressänderungen') {
+      renderAdresseSpezial(items, content);
+      const closeBtn = document.createElement('button');
+      closeBtn.type = 'button';
+      closeBtn.className = 'card-close-bottom';
+      closeBtn.textContent = 'Karte schließen';
+      closeBtn.addEventListener('click', () => {
+        details.open = false;
+        const hint = details.querySelector('.toggle-hint');
+        if (hint) hint.innerText = 'öffnen';
+        details.scrollIntoView({behavior:'smooth', block:'start'});
+      });
+      content.appendChild(closeBtn);
+      details.appendChild(content);
+      root.appendChild(details);
+      return;
+    }
+
+    if (blatt === '3_Lebendbilder') {
+      renderLebendbilderSpezial(items, content);
+      const closeBtn = document.createElement('button');
+      closeBtn.type = 'button';
+      closeBtn.className = 'card-close-bottom';
+      closeBtn.textContent = 'Karte schließen';
+      closeBtn.addEventListener('click', () => {
+        details.open = false;
+        const hint = details.querySelector('.toggle-hint');
+        if (hint) hint.innerText = 'öffnen';
+        details.scrollIntoView({behavior:'smooth', block:'start'});
+      });
+      content.appendChild(closeBtn);
+      details.appendChild(content);
+      root.appendChild(details);
+      return;
+    }
+
+
+    const visible = items.filter(k => !['Regel'].includes(k.typ));
+    const grouped = groupBy(visible, k => k.satzgruppe || k.bereich || k.blatt);
+
+    Object.entries(grouped).forEach(([satzgruppe, groupItems]) => {
+      const typSet = new Set(groupItems.map(k => k.typ));
+      const field = document.createElement('div');
+      field.className = 'field';
+      const title = document.createElement('label');
+      title.className = 'field-title';
+      title.textContent = labelForGroup(satzgruppe);
+      field.appendChild(title);
+
+      if (typSet.has('Dropdown') && groupItems.some(k => k.typ === 'Dropdown')) {
+        const select = document.createElement('select');
+        select.id = controlNameFor(groupItems[0]);
+        select.dataset.satzgruppe = satzgruppe;
+        select.dataset.blatt = blatt;
+        select.innerHTML = `<option value="">– bitte auswählen –</option>`;
+        groupItems.filter(k => k.typ === 'Dropdown').forEach(k => {
+          if (k.id === 'besonderheiten_vorhanden') return;
+          const opt = document.createElement('option');
+          opt.value = k.id;
+          opt.textContent = k.anzeige || k.id;
+          opt.title = k.hinweis || k.logik || '';
+          select.appendChild(opt);
+        });
+        field.appendChild(select);
+      }
+
+      const radios = groupItems.filter(k => k.typ === 'Radio');
+      if (radios.length) {
+        const wrap = document.createElement('div');
+        wrap.className = 'options';
+        radios.forEach((k, idx) => {
+          const lab = optionLabel(k, 'radio', controlNameFor(k), satzgruppe === 'mehrlingsstatus' && idx === 0);
+          wrap.appendChild(lab);
+        });
+        field.appendChild(wrap);
+      }
+
+      const checks = groupItems.filter(k => k.typ === 'Checkbox' || k.typ === 'Vorlage');
+      if (checks.length) {
+        const wrap = document.createElement('div');
+        wrap.className = 'options';
+        checks.forEach(k => wrap.appendChild(optionLabel(k, 'checkbox', k.id)));
+        field.appendChild(wrap);
+      }
+
+      const inputs = groupItems.filter(k => ['Eingabefeld','Freitext'].includes(k.typ));
+      inputs.forEach(k => {
+        const inp = document.createElement(k.typ === 'Freitext' ? 'textarea' : 'input');
+        inp.id = k.id;
+        if (k.typ !== 'Freitext') inp.type = 'text';
+        inp.placeholder = k.anzeige || '';
+        inp.dataset.satzgruppe = k.satzgruppe || '';
+        field.appendChild(inp);
+        if (k.hinweis || k.logik) {
+          const h = document.createElement('div');
+          h.className = 'hint';
+          h.textContent = k.hinweis || k.logik;
+          field.appendChild(h);
+        }
+      });
+
+      const hinweise = groupItems.filter(k => k.typ === 'Hinweis');
+      hinweise.forEach(k => {
+        const p = document.createElement('div');
+        p.className = 'hint';
+        p.innerHTML = `<span class="warn">Hinweis:</span> ${escapeHtml(k.anzeige)}`;
+        if (k.hinweis) p.innerHTML += `<br>${escapeHtml(k.hinweis)}`;
+        field.appendChild(p);
+      });
+
+      content.appendChild(field);
+    });
+
+
+    const closeBtn = document.createElement('button');
+    closeBtn.type = 'button';
+    closeBtn.className = 'card-close-bottom';
+    closeBtn.textContent = 'Karte schließen';
+    closeBtn.addEventListener('click', () => {
+      details.open = false;
+      const hint = details.querySelector('.toggle-hint');
+      if (hint) hint.innerText = 'öffnen';
+      details.scrollIntoView({behavior:'smooth', block:'start'});
+    });
+    content.appendChild(closeBtn);
+
+    details.appendChild(content);
+    root.appendChild(details);
+  });
+
+  document.querySelectorAll('details.card').forEach(card => {
+    card.addEventListener('toggle', () => {
+      const hint = card.querySelector('.toggle-hint');
+      if (hint) hint.innerText = card.open ? 'schließen' : 'öffnen';
+    });
+  });
+}
+
+function optionLabel(k, type, name, checked=false) {
+  const lab = document.createElement('label');
+  lab.className = 'option';
+  const input = document.createElement('input');
+  input.type = type;
+  input.name = type === 'radio' ? name : k.id;
+  input.id = k.id;
+  input.value = k.id;
+  input.dataset.satzgruppe = k.satzgruppe || '';
+  input.dataset.blatt = k.blatt || '';
+  if (checked) input.checked = true;
+  lab.appendChild(input);
+  const span = document.createElement('span');
+  span.innerHTML = escapeHtml(k.anzeige || k.id);
+  if (k.hinweis) span.innerHTML += `<div class="hint">${escapeHtml(k.hinweis)}</div>`;
+  lab.appendChild(span);
+  return lab;
+}
+
+function escapeHtml(s) {
+  return String(s || '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+}
+
+// =========================================================
+// Werte lesen
+// =========================================================
+function selectedIds() {
+  const ids = [];
+  document.querySelectorAll('select').forEach(sel => { if (sel.value) ids.push(sel.value); });
+  document.querySelectorAll('input[type="checkbox"]:checked,input[type="radio"]:checked').forEach(inp => { if (inp.value) ids.push(inp.value); });
+  return ids;
+}
+
+function selectedEntries() {
+  return selectedIds().map(id => byId[id]).filter(Boolean);
+}
+
+function selectedByGroup(gruppe) {
+  return selectedEntries().find(k => k.satzgruppe === gruppe);
+}
+
+function selectedAllByGroup(gruppe) {
+  return selectedEntries().filter(k => k.satzgruppe === gruppe);
+}
+
+function inputValue(id) {
+  return (document.getElementById(id)?.value || '').trim();
+}
+
+function clean(text) {
+  return String(text || '').trim().replace(/\s+/g,' ').replace(/\.$/,'');
+}
+
+function withDot(text) {
+  const t = String(text || '').trim();
+  if (!t) return '';
+  return /[.!?]$/.test(t) ? t : t + '.';
+}
+
+function pushIf(parts, text) {
+  const t = String(text || '').trim();
+  if (t) parts.push(t);
+}
+
+// =========================================================
+// Speziallogik aus deinem System
+// =========================================================
+function kindNummer(id) {
+  return {
+    erstes_kind:1, zweites_kind:2, drittes_kind:3, viertes_kind:4,
+    fuenftes_kind:5, sechstes_kind:6, siebtes_kind:7
+  }[id] || null;
+}
+
+function handNummer(id) {
+  return {
+    keine_kinder_hand:0, ein_kind_hand:1, zwei_kinder_hand:2, drei_kinder_hand:3,
+    vier_kinder_hand:4, fuenf_kinder_hand:5, sechs_kinder_hand:6, sieben_kinder_hand:7
+  }[id] ?? null;
+}
+
+function updateKinderHandOptions() {
+  const kind = selectedByGroup('kindfolge');
+  const select = document.querySelector('select[data-satzgruppe="kinder_an_der_hand"]');
+  if (!select) return;
+  const n = kindNummer(kind?.id);
+  [...select.options].forEach(opt => {
+    if (!opt.value || !n) { opt.disabled = false; return; }
+    const h = handNummer(opt.value);
+    opt.disabled = h > Math.max(0, n - 1);
+  });
+  if (select.selectedOptions[0]?.disabled) select.value = '';
+}
+
+
+function updateMehrlingsSituationOptions() {
+  const status = selectedByGroup('mehrlingsstatus');
+  const statusId = status?.id || 'einling';
+  const situationInputs = [...document.querySelectorAll('input[data-satzgruppe="mehrlingssituation"]')];
+
+  situationInputs.forEach(inp => {
+    const lab = inp.closest('label');
+    let sichtbar = false;
+
+    if (statusId === 'zwillinge') {
+      sichtbar = inp.id.startsWith('zwillinge_');
+    } else if (statusId === 'drillinge' || statusId === 'mehrlinge') {
+      sichtbar = inp.id === 'mehrlinge_unterschiedliche_situation';
+    }
+
+    inp.disabled = !sichtbar;
+    if (!sichtbar) inp.checked = false;
+    if (lab) lab.classList.toggle('hidden', !sichtbar);
+  });
+
+  const field = situationInputs[0]?.closest('.field');
+  if (field) field.classList.toggle('hidden', statusId === 'einling' || situationInputs.every(inp => inp.disabled));
+}
+
+function baueFamiliensatz(verbraucht) {
+  const kind = selectedByGroup('kindfolge');
+  const hand = selectedByGroup('kinder_an_der_hand');
+  if (!kind && !hand) return '';
+
+  if (kind) verbraucht.add(kind.id);
+  if (hand) verbraucht.add(hand.id);
+
+  const kindText = clean(kind?.bericht || '');
+  const handText = clean(hand?.bericht || '');
+
+  if (kindText && handText) {
+    if (hand?.id === 'keine_kinder_hand') {
+      return `${kindText}, die Eltern haben jedoch keine Kinder an der Hand.`;
+    }
+    return `${kindText}, die Eltern haben ${handText} an der Hand.`;
+  }
+
+  if (kindText) return withDot(kindText);
+  if (handText) return `Die Eltern haben ${handText} an der Hand.`;
+  return '';
+}
+
+function artikelUndAdjektiv(rolleId, beschreibung) {
+  const fem = ['mama','oma','freundin','hebamme','schwester','aerztin','seelsorgerin'];
+  const masc = ['papa','arzt','seelsorger'];
+  const plural = [];
+  if (!beschreibung) {
+    if (fem.includes(rolleId)) return 'die';
+    if (masc.includes(rolleId)) return 'den';
+    return '';
+  }
+  if (fem.includes(rolleId)) return 'die ' + beschreibung + 'e';
+  if (masc.includes(rolleId)) return 'den ' + beschreibung + 'en';
+  return 'den ' + beschreibung + 'en';
+}
+
+function baueAnsprechpartner(verbraucht) {
+  const rolle = selectedByGroup('ansprechpartner_rolle');
+  const beschr = selectedByGroup('ansprechpartner_beschreibung');
+  const art = selectedByGroup('ansprechpartner_gespraechsart');
+
+  if (!rolle && !art) return '';
+
+  [rolle,beschr,art].filter(Boolean).forEach(k => verbraucht.add(k.id));
+
+  const rolleId = rolle?.id || '';
+  const adj = beschr && beschr.id !== 'keine_beschreibung'
+    ? clean(beschr.bericht || beschr.anzeige || '')
+    : '';
+
+  let name = capitalise(inputValue('ansprechpartner_name'));
+
+  const rollenGrammatik = {
+    papa:                 { artikel: 'dem',   adjEndung: 'en', nomen: 'Papa',                 dr: false },
+    mama:                 { artikel: 'der',   adjEndung: 'en', nomen: 'Mama',                 dr: false },
+    oma:                  { artikel: 'der',   adjEndung: 'en', nomen: 'Oma',                  dr: false },
+    freundin:             { artikel: 'der',   adjEndung: 'en', nomen: 'Freundin',             dr: false },
+    familienangehoeriger: { artikel: 'einem', adjEndung: 'en', nomen: 'Familienangehörigen',  dr: false },
+    hebamme:              { artikel: 'der',   adjEndung: 'en', nomen: 'Hebamme',              dr: false },
+    schwester:            { artikel: 'der',   adjEndung: 'en', nomen: 'Schwester',            dr: false },
+    aerztin:              { artikel: 'der',   adjEndung: 'en', nomen: 'Ärztin',               dr: true  },
+    arzt:                 { artikel: 'dem',   adjEndung: 'en', nomen: 'Arzt',                 dr: true  },
+    seelsorgerin:         { artikel: 'der',   adjEndung: 'en', nomen: 'Frau',                 dr: false, zusatz: 'von der Seelsorge' },
+    seelsorger:           { artikel: 'dem',   adjEndung: 'en', nomen: 'Herrn',                dr: false, zusatz: 'von der Seelsorge' }
+  };
+
+  function adjTeil(regel) {
+    return adj ? adj + regel.adjEndung + ' ' : '';
+  }
+
+  let person = '';
+
+  if (rolleId === 'sozialdienst') {
+    person = adj
+      ? 'jemandem ' + adj + 'en vom Sozialdienst'
+      : 'jemandem vom Sozialdienst';
+  } else if (rollenGrammatik[rolleId]) {
+    const regel = rollenGrammatik[rolleId];
+
+    if (regel.dr && name && !/^Dr\./i.test(name)) {
+      name = 'Dr. ' + name;
+    }
+
+    person = regel.artikel + ' ' + adjTeil(regel) + regel.nomen;
+
+    if (name) person += ' ' + name;
+    if (regel.zusatz) person += ' ' + regel.zusatz;
+
+  } else if (rolle) {
+    person = clean(rolle.bericht || rolle.anzeige || 'jemandem');
+  } else {
+    person = 'jemandem';
+  }
+
+  let verb = 'gesprochen';
+  if (art?.id === 'telefon') verb = 'telefoniert';
+  if (art?.id === 'ruecksprache') verb = 'Rücksprache gehalten';
+
+  return `Ich habe mit ${person} ${verb}.`.replace(/\s+/g,' ').trim();
+}
+
+function gespraechsartText(id) {
+  if (id === 'telefon') return 'am Telefon';
+  if (id === 'ruecksprache') return 'zur Rücksprache';
+  return 'gesprochen';
+}
+
+function gespraechsartVerb(id) {
+  if (id === 'telefon') return 'am Telefon gesprochen';
+  if (id === 'ruecksprache') return 'Rücksprache gehalten';
+  return 'gesprochen';
+}
+
+function capitalise(s) {
+  if (!s) return '';
+  return s.charAt(0).toLocaleUpperCase('de-DE') + s.slice(1);
+}
+
+
+function baueLebendbilder(verbraucht) {
+  const teile = [];
+
+  const geburt = selectedByGroup('lebendbilder_geburt');
+  const prognose = selectedByGroup('lebendbilder_prognose');
+
+  const ssw = inputValue('ssw');
+  const alter = inputValue('alter_zahl');
+  const einheit = selectedByGroup('lebendbilder_alter');
+  const ergaenzung = inputValue('lebendbilder_ergaenzung');
+
+  if (geburt) verbraucht.add(geburt.id);
+  if (prognose) verbraucht.add(prognose.id);
+  if (einheit) verbraucht.add(einheit.id);
+
+  const einheitText = einheit && einheit.id !== 'keine_altersangabe'
+    ? clean(einheit.bericht || einheit.anzeige || '')
+    : '';
+
+  // Neutraler Geburtssatz: keine harte Singularform mehr.
+  // Ausgabe erst, wenn echte Werte vorhanden sind.
+  if (ssw && alter && einheitText) {
+    teile.push(`Die Geburt fand vor ${alter} ${einheitText} in der ${ssw}. SSW statt.`);
+  } else if (ssw) {
+    teile.push(`Die Geburt fand in der ${ssw}. SSW statt.`);
+  } else if (alter && einheitText) {
+    teile.push(`Die Geburt fand vor ${alter} ${einheitText} statt.`);
+  }
+
+  if (prognose && prognose.bericht) {
+    teile.push(clean(prognose.bericht));
+  }
+
+  if (ergaenzung) {
+    teile.push(ergaenzung);
+  }
+
+  return teile.join(' ');
+}
+
+function lebendbilderGenutzt() {
+  const geburt = selectedByGroup('lebendbilder_geburt');
+  const prognose = selectedByGroup('lebendbilder_prognose');
+  const ssw = inputValue('ssw');
+  const alter = inputValue('alter_zahl');
+  const ergaenzung = inputValue('lebendbilder_ergaenzung');
+  return !!(geburt || prognose || ssw || alter || ergaenzung);
+}
+
+
+function baueListe(statusGroup, listGroup, label, verbraucht) {
+  const status = selectedByGroup(statusGroup);
+  const liste = selectedAllByGroup(listGroup);
+  if (status) verbraucht.add(status.id);
+  liste.forEach(k => verbraucht.add(k.id));
+
+  if (status && status.id.includes('keine_')) return status.bericht;
+  if (status && status.id.includes('unklar')) return status.bericht;
+  if (liste.length) return `${label}:\n- ` + liste.map(k => k.bericht).filter(Boolean).join('\n- ');
+  if (status?.bericht && status.ausgabeart === 'direkt') return status.bericht;
+  return '';
+}
+
+function baueSammelwert(gruppe, prefix, verbraucht) {
+  const items = selectedAllByGroup(gruppe).filter(k => k.bericht);
+  if (!items.length) return '';
+  items.forEach(k => verbraucht.add(k.id));
+  const werte = items.map(k => k.bericht);
+  return prefix + joinGerman(werte) + '.';
+}
+
+function joinGerman(arr) {
+  if (arr.length <= 1) return arr[0] || '';
+  if (arr.length === 2) return arr[0] + ' und ' + arr[1];
+  return arr.slice(0,-1).join(', ') + ' und ' + arr[arr.length-1];
+}
+
+
+function baueBilder(verbraucht) {
+  const parts = [];
+  const genutzt = new Set();
+
+  const bildbezugEintrag = selectedByGroup('bildbezug');
+  if (bildbezugEintrag) verbraucht.add(bildbezugEintrag.id);
+
+  const familie = selectedAllByGroup('bilder_familie');
+  const unklar = selectedAllByGroup('bilder_unklar');
+  const zeitfenster = selectedAllByGroup('bilder_zeitfenster');
+
+  [...familie, ...unklar, ...zeitfenster].forEach(k => verbraucht.add(k.id));
+
+  const hatGemeinsame =
+    familie.some(k => k.id === 'gemeinsame_bilder_gewuenscht') ||
+    familie.some(k => k.id === 'gemeinsame_bilder_kind');
+
+  const hatGeschwister = familie.some(k => k.id === 'geschwister_vermutlich');
+  const nurHeute = zeitfenster.some(k => k.id === 'bilder_heute');
+  const auchMorgen = zeitfenster.some(k => k.id === 'bilder_morgen');
+  const geschwisterUnklar = unklar.some(k => k.id === 'geschwister_bilder_unklar');
+
+  // Neutral: kein harter Bezug "mit ihrem Kind" mehr.
+  if (hatGemeinsame && hatGeschwister && nurHeute) {
+    parts.push('Die Eltern und Geschwister möchten bei den Bildern dabei sein, welche jedoch nur heute möglich sind.');
+    ['gemeinsame_bilder_gewuenscht','gemeinsame_bilder_kind','geschwister_vermutlich','bilder_heute'].forEach(id => genutzt.add(id));
+  } else if (hatGemeinsame && hatGeschwister && auchMorgen) {
+    parts.push('Die Eltern und Geschwister möchten bei den Bildern dabei sein, welche auch morgen noch möglich sind.');
+    ['gemeinsame_bilder_gewuenscht','gemeinsame_bilder_kind','geschwister_vermutlich','bilder_morgen'].forEach(id => genutzt.add(id));
+  } else if (hatGemeinsame && geschwisterUnklar && nurHeute) {
+    parts.push('Die Eltern möchten bei den Bildern dabei sein, welche jedoch nur heute möglich sind; ob auch Geschwister bei den Bildern dabei sein werden, ist aktuell noch unklar.');
+    ['gemeinsame_bilder_gewuenscht','gemeinsame_bilder_kind','geschwister_bilder_unklar','bilder_heute'].forEach(id => genutzt.add(id));
+  } else if (hatGemeinsame && geschwisterUnklar && auchMorgen) {
+    parts.push('Die Eltern möchten bei den Bildern dabei sein, welche auch morgen noch möglich sind; ob auch Geschwister bei den Bildern dabei sein werden, ist aktuell noch unklar.');
+    ['gemeinsame_bilder_gewuenscht','gemeinsame_bilder_kind','geschwister_bilder_unklar','bilder_morgen'].forEach(id => genutzt.add(id));
+  } else if (hatGemeinsame && hatGeschwister) {
+    parts.push('Die Eltern und Geschwister möchten bei den Bildern dabei sein.');
+    ['gemeinsame_bilder_gewuenscht','gemeinsame_bilder_kind','geschwister_vermutlich'].forEach(id => genutzt.add(id));
+  } else if (hatGemeinsame && geschwisterUnklar) {
+    parts.push('Die Eltern möchten bei den Bildern dabei sein, wobei aktuell noch unklar ist, ob auch Geschwister bei den Bildern dabei sein werden.');
+    ['gemeinsame_bilder_gewuenscht','gemeinsame_bilder_kind','geschwister_bilder_unklar'].forEach(id => genutzt.add(id));
+  } else if (hatGemeinsame && nurHeute) {
+    parts.push('Die Eltern möchten bei den Bildern dabei sein, welche jedoch nur heute möglich sind.');
+    ['gemeinsame_bilder_gewuenscht','gemeinsame_bilder_kind','bilder_heute'].forEach(id => genutzt.add(id));
+  } else if (hatGemeinsame && auchMorgen) {
+    parts.push('Die Eltern möchten bei den Bildern dabei sein, welche auch morgen noch möglich sind.');
+    ['gemeinsame_bilder_gewuenscht','gemeinsame_bilder_kind','bilder_morgen'].forEach(id => genutzt.add(id));
+  }
+
+  familie.forEach(k => {
+    if (genutzt.has(k.id)) return;
+
+    if (k.id === 'gemeinsame_bilder_gewuenscht' || k.id === 'gemeinsame_bilder_kind') {
+      parts.push('Die Eltern möchten bei den Bildern dabei sein.');
+      return;
+    }
+
+    if (k.bericht) parts.push(clean(k.bericht));
+  });
+
+  unklar.forEach(k => {
+    if (genutzt.has(k.id)) return;
+    if (k.bericht) parts.push(clean(k.bericht));
+  });
+
+  zeitfenster.forEach(k => {
+    if (genutzt.has(k.id)) return;
+    if (k.bericht) parts.push(clean(k.bericht));
+  });
+
+  return parts.map(withDot).join(' ');
+}
+
+
+
+function baueAdressblock(verbraucht) {
+  const items = karten.filter(k => k.blatt === '0_Adressänderungen');
+  const values = [];
+  items.forEach(k => {
+    verbraucht.add(k.id);
+    const v = inputValue(k.id);
+    if (v) values.push(v);
+  });
+  if (!values.length) return '';
+  return 'Adressdaten:\n' + values.join('\n');
+}
+
+
+// =========================================================
+// Bericht bauen
+
+// =========================================================
+// Bericht bauen
+// =========================================================
+
+function tageText(tage) {
+  const t = clean(tage || '');
+  if (!t) return '';
+  return t === '1' ? '1 Tag' : `${t} Tagen`;
+}
+
+function istZukunftsOderHeuteAngabe(text) {
+  const t = clean(text).toLowerCase();
+  return /\b(heute|morgen|übermorgen|uebermorgen)\b/.test(t);
+}
+
+function baueEinleitung(verbraucht) {
+  const status = selectedByGroup('einleitung_status');
+  const datum = inputValue('einleitung_datum');
+  const tage = inputValue('einleitung_tage');
+
+  if (!status && !datum && !tage) return '';
+  if (status) verbraucht.add(status.id);
+
+  const tageFormuliert = tageText(tage);
+
+  if (status?.id === 'einleitung_wird') {
+    // Zukunft: konkreter Zeitpunkt gewinnt vor Tagefeld. So entstehen keine Sätze wie "morgen ... in 2 Tagen".
+    if (datum) return `Die Mutter wird ${datum} zur Einleitung in die Klinik gehen.`;
+    if (tageFormuliert) return `Die Mutter wird voraussichtlich in ${tageFormuliert} zur Einleitung in die Klinik gehen.`;
+    return status.bericht || 'Die Mutter wird zur Einleitung in die Klinik gehen.';
+  }
+
+  if (status?.id === 'einleitung_ist') {
+    // Vergangenheit/Gegenwart: Tage gewinnen vor Datum, damit keine Sätze wie "seit morgen, seit 2 Tagen" entstehen.
+    if (tageFormuliert) return `Die Mutter befindet sich seit ${tageFormuliert} zur Einleitung in der Klinik.`;
+    if (datum && !istZukunftsOderHeuteAngabe(datum)) return `Die Mutter befindet sich seit ${datum} zur Einleitung in der Klinik.`;
+    return status.bericht || 'Die Mutter befindet sich zur Einleitung in der Klinik.';
+  }
+
+  if (status?.id === 'dauer_unbekannt') {
+    return status.bericht || 'Wie lange es bis zur Geburt dauern wird, ist aktuell nicht bekannt.';
+  }
+
+  if (datum) return `Einleitungszeitpunkt: ${datum}.`;
+  if (tageFormuliert) return `Einleitung seit ${tageFormuliert}.`;
+  return '';
+}
+
+function baueBericht() {
+  updateKinderHandOptions();
+  updateMehrlingsSituationOptions();
+
+  const verbraucht = new Set();
+  const oben = [];
+  const abschnitte = [];
+
+  const begr = selectedByGroup('begruessung');
+  if (begr) { verbraucht.add(begr.id); if (begr.bericht) oben.push(begr.bericht); }
+
+  if (lebendbilderGenutzt()) oben.push('HIER GEHT ES UM LEBENDBILDER, ES EILT.');
+
+  // 1 Ansprechpartner
+  pushIf(abschnitte, baueAnsprechpartner(verbraucht));
+
+  // 2 Lebendbilder
+  pushIf(abschnitte, baueLebendbilder(verbraucht));
+
+  // 3 Einleitung – bewusst nicht mehr stumpf aus allen Feldern zusammensetzen.
+  pushIf(abschnitte, baueEinleitung(verbraucht));
+  selectedAllByGroup('einleitung_erwartung').forEach(k => {
+    verbraucht.add(k.id);
+    if (k.ausgabeart === 'direkt') pushIf(abschnitte, k.bericht);
+  });
+  pushIf(abschnitte, ergaenzungValue('ergaenzung_einleitung'));
+
+  // 4 Aktuelle Situation
+  pushIf(abschnitte, baueFamiliensatz(verbraucht));
+
+  selectedAllByGroup('grundsituation').forEach(k => {
+    verbraucht.add(k.id);
+    if (k.bericht) pushIf(abschnitte, k.bericht);
+  });
+
+  const mehrlingsstatus = selectedByGroup('mehrlingsstatus');
+  selectedAllByGroup('mehrlingsstatus').forEach(k => verbraucht.add(k.id));
+  if (mehrlingsstatus && mehrlingsstatus.id !== 'einling') {
+    selectedAllByGroup('mehrlingssituation').forEach(k => {
+      verbraucht.add(k.id);
+      if (k.bericht) pushIf(abschnitte, k.bericht);
+    });
+  } else {
+    selectedAllByGroup('mehrlingssituation').forEach(k => verbraucht.add(k.id));
+  }
+
+  ['familienstruktur','aktuelle_situation_status'].forEach(gruppe => {
+    selectedAllByGroup(gruppe).forEach(k => {
+      verbraucht.add(k.id);
+      if (k.ausgabeart === 'direkt') pushIf(abschnitte, k.bericht);
+    });
+  });
+  pushIf(abschnitte, ergaenzungValue('ergaenzung_aktuelle_situation'));
+
+  // 5 Besonderheiten
+  pushIf(abschnitte, baueListe('besonderheiten_status','besonderheiten_liste','Äußerliche Besonderheiten', verbraucht));
+  pushIf(abschnitte, ergaenzungValue('ergaenzung_besonderheiten'));
+
+  // 6 Kleidung
+  selectedAllByGroup('kleidung').forEach(k => {
+    verbraucht.add(k.id);
+    if (k.ausgabeart === 'direkt') pushIf(abschnitte, k.bericht);
+  });
+  pushIf(abschnitte, baueSammelwert('eltern_bringen_mit', 'Die Eltern bringen ', verbraucht));
+  pushIf(abschnitte, ergaenzungValue('ergaenzung_kleidung'));
+
+  // 7 Bilder
+  pushIf(abschnitte, baueBilder(verbraucht));
+  pushIf(abschnitte, ergaenzungValue('ergaenzung_bilder'));
+
+  // 8 Wassermethode
+  ['wassermethode_status','wassermethode_zusatz'].forEach(gruppe => {
+    selectedAllByGroup(gruppe).forEach(k => {
+      verbraucht.add(k.id);
+      if (k.ausgabeart === 'direkt') pushIf(abschnitte, k.bericht);
+    });
+  });
+  pushIf(abschnitte, ergaenzungValue('ergaenzung_wassermethode'));
+
+  // 9 Kommunikation
+  selectedAllByGroup('kommunikation_sprache').forEach(k => {
+    verbraucht.add(k.id);
+    if (k.ausgabeart === 'direkt') pushIf(abschnitte, k.bericht);
+  });
+  pushIf(abschnitte, ergaenzungValue('ergaenzung_kommunikation'));
+
+  // 10 Infekte
+  pushIf(abschnitte, baueListe('infekte_status','infekte_liste','Infekte', verbraucht));
+  pushIf(abschnitte, ergaenzungValue('ergaenzung_infekte'));
+
+  const frage = selectedByGroup('abschlussfrage');
+  if (frage) verbraucht.add(frage.id);
+
+  const gruss = selectedByGroup('grussformel');
+  if (gruss) verbraucht.add(gruss.id);
+
+  selectedEntries().forEach(k => {
+    if (verbraucht.has(k.id)) return;
+    if (k.ausgabeart === 'direkt' && k.bericht) {
+      verbraucht.add(k.id);
+      pushIf(abschnitte, k.bericht);
+    }
+  });
+
+  if (frage?.bericht) abschnitte.push(frage.bericht);
+
+  if (gruss?.bericht) {
+    const grussName = inputValue('gruss_Name');
+    abschnitte.push(grussName ? `${gruss.bericht} ${capitalise(grussName)}` : gruss.bericht);
+  }
+
+  // Adressdaten gehören wirklich ganz ans Ende – nach Abschlussfrage und Grußformel.
+  pushIf(abschnitte, baueAdressblock(verbraucht));
+
+  const text = [...oben, ...abschnitte].filter(Boolean).join('\n\n');
+  document.getElementById('debugInfo').innerText = `${selectedIds().length} Auswahl(en), ${verbraucht.size} verarbeitet`;
+  return text;
+}
+
+
+function applyExcludeLogik() {
+  // Erst alles wieder freigeben
+  document.querySelectorAll('input[type="checkbox"], input[type="radio"], select option').forEach(el => {
+    el.disabled = false;
+    if (el.closest) el.closest('.option')?.classList.remove('disabled-option');
+  });
+
+  selectedEntries().forEach(item => {
+    const logik = String(item.logik || '');
+    const matches = [...logik.matchAll(/exclude:([^;]+)/g)];
+
+    matches.forEach(match => {
+      const alias = {
+        eltern_unklar: 'eltern_bilder_unklar'
+      };
+      const ids = match[1].split(',')
+        .map(x => x.trim())
+        .filter(Boolean)
+        .map(id => alias[id] || id);
+
+      ids.forEach(id => {
+        const target = document.getElementById(id);
+
+        if (target) {
+          if (target.type === 'checkbox' || target.type === 'radio') {
+            target.checked = false;
+            target.disabled = true;
+            target.closest('.option')?.classList.add('disabled-option');
+          } else {
+            target.disabled = true;
+          }
+        }
+
+        // Falls es eine Select-Option ist
+        document.querySelectorAll(`select option[value="${CSS.escape(id)}"]`).forEach(opt => {
+          opt.selected = false;
+          opt.disabled = true;
+        });
+      });
+    });
+  });
+}
+
+function aktualisieren() {
+  applyExcludeLogik();
+  document.getElementById('bericht').innerText = baueBericht();
+}
+
+function kopieren() {
+  navigator.clipboard.writeText(document.getElementById('bericht').innerText).then(() => {
+    const btn = document.getElementById('copyBtn');
+    const alt = btn.innerText;
+    btn.innerText = 'Kopiert';
+    setTimeout(() => btn.innerText = alt, 1200);
+  });
+}
+
+function loeschen() {
+  document.querySelectorAll('select').forEach(s => s.value = '');
+  document.querySelectorAll('input[type="checkbox"]').forEach(i => i.checked = false);
+  document.querySelectorAll('input[type="radio"]').forEach(i => i.checked = false);
+  const einling = document.getElementById('einling');
+  if (einling) einling.checked = true;
+  document.querySelectorAll('input[type="text"],textarea').forEach(i => i.value = '');
+  aktualisieren();
+}
+
+render();
+updateMehrlingsSituationOptions();
+
+// Zusatzfeld Name in Ansprechpartner direkt unter Rolle einfügen
+(function () {
+  const ansCard = [...document.querySelectorAll('.card')].find(c => c.dataset.blatt === '2_Ansprechpartner');
+  if (!ansCard || document.getElementById('ansprechpartner_name')) return;
+  const content = ansCard.querySelector('.content');
+  const div = document.createElement('div');
+  div.className = 'field';
+  div.innerHTML = '<label class="field-title" for="ansprechpartner_name">Name optional</label><input type="text" id="ansprechpartner_name" placeholder="z. B. Jenny">';
+  const rolleField = content?.querySelector('[data-satzgruppe="ansprechpartner_rolle"]')?.closest('.field');
+  if (rolleField && rolleField.nextSibling) {
+    content.insertBefore(div, rolleField.nextSibling);
+  } else if (content) {
+    content.prepend(div);
+  }
+})();
+
+
+// Ergänzungsfelder für inhaltliche Karten ergänzen, falls sie nicht aus JSON gerendert wurden
+(function () {
+  const configs = [
+    ['4_Einleitung', 'ergaenzung_einleitung'],
+    ['5_Aktuelle_Situation', 'ergaenzung_aktuelle_situation'],
+    ['6_Besonderheiten', 'ergaenzung_besonderheiten'],
+    ['7_Kleidung', 'ergaenzung_kleidung'],
+    ['8_Erinnerungen_Bilder', 'ergaenzung_bilder'],
+    ['9_Wassermethode', 'ergaenzung_wassermethode'],
+    ['10_Kommunikation', 'ergaenzung_kommunikation'],
+    ['11_Infekte', 'ergaenzung_infekte']
+  ];
+
+  configs.forEach(([blatt, id]) => {
+    const card = document.querySelector(`.card[data-blatt="${blatt}"]`);
+    const content = card?.querySelector('.content');
+    if (!content || document.getElementById(id)) return;
+
+    const field = document.createElement('div');
+    field.className = 'field';
+    field.innerHTML = `<label class="field-title" for="${id}">Ergänzung</label><textarea id="${id}" placeholder="Eigene Ergänzung ..."></textarea>`;
+
+    const closeBtn = content.querySelector('.card-close-bottom');
+    if (closeBtn) content.insertBefore(field, closeBtn);
+    else content.appendChild(field);
+  });
+})();
+
+function ergaenzungValue(id) {
+  const el = document.getElementById(id);
+  return el && el.value ? el.value.trim() : '';
+}
+
+
+document.addEventListener('input', aktualisieren);
+document.addEventListener('change', aktualisieren);
+document.getElementById('copyBtn').addEventListener('click', kopieren);
+document.getElementById('clearBtn').addEventListener('click', loeschen);
+aktualisieren();
+
+
+
+</script>
+
+<script>
+/* === UX-Update: Accordion, Kartenfarben, Sperrlogik === */
+(function () {
+  function cardTitle(card) {
+    const s = card.querySelector('summary');
+    return (s ? s.textContent : '').toLowerCase();
+  }
+
+  function findCardByBlatt(blatt) {
+    return Array.from(document.querySelectorAll('.card')).find(card => card.dataset.blatt === blatt);
+  }
+
+  function inputHasRealUserValue(el) {
+    if (!el || el.disabled || el.type === 'hidden') return false;
+
+    if (el.type === 'radio') {
+      if (!el.checked) return false;
+      // Defaultwert "Ein Kind" soll Aktuelle Situation nicht sofort als bearbeitet markieren.
+      if (el.id === 'einling') return false;
+      return true;
+    }
+
+    if (el.type === 'checkbox') return !!el.checked;
+
+    if (el.tagName === 'SELECT') {
+      return !!el.value && el.value.trim() !== '';
+    }
+
+    return !!el.value && el.value.trim() !== '';
+  }
+
+  function cardHasValues(card) {
+    return Array.from(card.querySelectorAll('input, select, textarea')).some(inputHasRealUserValue);
+  }
+
+  function updateCardStates() {
+    document.querySelectorAll('.card').forEach(card => {
+      if (card.hasAttribute('open')) {
+        card.classList.remove('card-empty', 'card-complete');
+        return;
+      }
+      const complete = cardHasValues(card);
+      card.classList.toggle('card-complete', complete);
+      card.classList.toggle('card-empty', !complete);
+    });
+  }
+
+  function closeOtherCards(currentCard) {
+    document.querySelectorAll('.card').forEach(card => {
+      if (card !== currentCard && card.hasAttribute('open')) {
+        card.removeAttribute('open');
+        const hint = card.querySelector('.toggle-hint');
+        if (hint) hint.innerText = 'öffnen';
+      }
+    });
+    updateCardStates();
+  }
+
+  function ensureHint(card, text) {
+    if (!card) return;
+    let hint = card.querySelector('.card-lock-hint');
+    if (!hint) {
+      hint = document.createElement('div');
+      hint.className = 'card-lock-hint';
+      const content = card.querySelector('.content') || card;
+      content.prepend(hint);
+    }
+    hint.textContent = text;
+  }
+
+  function clearHint(card) {
+    if (!card) return;
+    const hint = card.querySelector('.card-lock-hint');
+    if (hint) hint.remove();
+  }
+
+  function setCardDisabled(card, disabled, hintText) {
+    if (!card) return;
+    card.classList.toggle('card-disabled', disabled);
+    if (disabled) {
+      card.removeAttribute('open');
+      const hint = card.querySelector('.toggle-hint');
+      if (hint) hint.innerText = 'gesperrt';
+      ensureHint(card, hintText);
+    } else {
+      const hint = card.querySelector('.toggle-hint');
+      if (hint) hint.innerText = card.hasAttribute('open') ? 'schließen' : 'öffnen';
+      clearHint(card);
+    }
+  }
+
+  function updateLebendbilderEinleitungLock() {
+    const lebend = findCardByBlatt('3_Lebendbilder');
+    const einleitung = findCardByBlatt('4_Einleitung');
+    if (!lebend || !einleitung) return;
+
+    const lebendAktiv = cardHasValues(lebend);
+    const einleitungAktiv = cardHasValues(einleitung);
+
+    if (lebendAktiv && !einleitungAktiv) {
+      setCardDisabled(einleitung, true, 'Lebendbilder aktiv – Einleitung derzeit ausgeblendet.');
+      setCardDisabled(lebend, false);
+    } else if (einleitungAktiv && !lebendAktiv) {
+      setCardDisabled(lebend, true, 'Einleitung aktiv – Lebendbilder derzeit ausgeblendet.');
+      setCardDisabled(einleitung, false);
+    } else {
+      setCardDisabled(lebend, false);
+      setCardDisabled(einleitung, false);
+    }
+  }
+
+  function initUxUpdate() {
+    document.querySelectorAll('.card summary').forEach(summary => {
+      summary.addEventListener('click', () => {
+        const current = summary.parentElement;
+        setTimeout(() => closeOtherCards(current), 0);
+      });
+    });
+
+    document.addEventListener('input', () => {
+      updateCardStates();
+      updateLebendbilderEinleitungLock();
+    });
+
+    document.addEventListener('change', () => {
+      updateCardStates();
+      updateLebendbilderEinleitungLock();
+    });
+
+    updateCardStates();
+    updateLebendbilderEinleitungLock();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => setTimeout(initUxUpdate, 200));
+  } else {
+    setTimeout(initUxUpdate, 200);
+  }
+})();
+</script>
+
+
+<script>
+/* Nur geschlossene Kartenfläche öffnen – ohne Buttons/Inputs zu stören */
+document.addEventListener('click', function(event) {
+  const card = event.target.closest('details.card');
+  if (!card || card.open) return;
+  if (event.target.closest('summary, button, input, select, textarea, label, a')) return;
+
+  card.open = true;
+  const hint = card.querySelector('.toggle-hint');
+  if (hint) hint.innerText = 'schließen';
+
+  document.querySelectorAll('details.card[open]').forEach(other => {
+    if (other !== card) {
+      other.removeAttribute('open');
+      const otherHint = other.querySelector('.toggle-hint');
+      if (otherHint) otherHint.innerText = 'öffnen';
+    }
+  });
+});
+</script>
+
+
+
+
+<script>
+/* === Mini-Fix: Kartenstatus beim Schließen ohne Default-Einling === */
+(function(){
+  function isReallyVisible(el) {
+    if (!el) return false;
+    if (el.type === 'hidden') return false;
+    if (el.closest('.hidden')) return false;
+    if (el.closest('[hidden]')) return false;
+    const label = el.closest('label');
+    if (label && label.classList.contains('hidden')) return false;
+    return true;
+  }
+
+  function selectHasValue(select) {
+    const value = String(select.value || '').trim();
+    const text = String(select.options[select.selectedIndex]?.textContent || '').trim().toLowerCase();
+
+    if (!value) return false;
+    if (value.startsWith('keine_')) return false;
+    if (text.includes('bitte auswählen')) return false;
+    if (text.startsWith('keine ') || text.startsWith('kein ')) return false;
+
+    return true;
+  }
+
+  function fieldHasValue(field) {
+    if (!field || field.disabled || !isReallyVisible(field)) return false;
+
+    if (field.type === 'radio') {
+      if (!field.checked) return false;
+
+      // Wichtig: Standardwert in "Aktuelle Situation" darf die Karte nicht grün machen.
+      if (field.id === 'einling') return false;
+
+      return true;
+    }
+
+    if (field.type === 'checkbox') {
+      return !!field.checked;
+    }
+
+    if (field.tagName === 'SELECT') {
+      return selectHasValue(field);
+    }
+
+    return String(field.value || '').trim() !== '';
+  }
+
+  function cardHasRealValue(card) {
+    return Array.from(card.querySelectorAll('input, select, textarea')).some(fieldHasValue);
+  }
+
+  function refreshCard(card) {
+    if (!card || !card.classList || !card.classList.contains('card')) return;
+
+    card.classList.remove('card-empty', 'card-complete');
+
+    if (cardHasRealValue(card)) {
+      card.classList.add('card-complete');
+    } else {
+      card.classList.add('card-empty');
+    }
+  }
+
+  function refreshFromEvent(ev) {
+    const card = ev.target.closest && ev.target.closest('.card');
+    if (!card) return;
+    refreshCard(card);
+    requestAnimationFrame(function(){ refreshCard(card); });
+  }
+
+  document.addEventListener('input', refreshFromEvent, true);
+  document.addEventListener('change', refreshFromEvent, true);
+
+  document.addEventListener('toggle', function(ev){
+    const card = ev.target;
+    if (!card || !card.classList || !card.classList.contains('card')) return;
+    refreshCard(card);
+    requestAnimationFrame(function(){ refreshCard(card); });
+    setTimeout(function(){ refreshCard(card); }, 80);
+  }, true);
+
+  const clearBtn = document.getElementById('clearBtn');
+  if (clearBtn) {
+    clearBtn.addEventListener('click', function(){
+      setTimeout(function(){
+        document.querySelectorAll('.card').forEach(function(card){
+          card.removeAttribute('open');
+          refreshCard(card);
+        });
+      }, 140);
+    });
+  }
+
+  window.addEventListener('load', function(){
+    setTimeout(function(){
+      document.querySelectorAll('.card').forEach(refreshCard);
+    }, 250);
+  });
+})();
+</script>
+
+
+<script>
+/* === FINAL: Reset-Fix für Lebendbilder/Einleitung nach Eingaben löschen === */
+(function(){
+  function findCard(blatt) {
+    return document.querySelector('.card[data-blatt="' + blatt + '"]');
+  }
+
+  function unlockCard(card) {
+    if (!card) return;
+
+    card.classList.remove('card-disabled');
+    card.removeAttribute('disabled');
+
+    const lockHint = card.querySelector('.card-lock-hint');
+    if (lockHint) lockHint.remove();
+
+    const toggleHint = card.querySelector('.toggle-hint');
+    if (toggleHint) {
+      toggleHint.innerText = card.hasAttribute('open') ? 'schließen' : 'öffnen';
+    }
+  }
+
+  function cardHasRealValue(card) {
+    if (!card) return false;
+
+    const fields = card.querySelectorAll('input, textarea, select');
+
+    for (const field of fields) {
+      if (field.disabled || field.type === 'hidden') continue;
+      if (field.closest('.hidden') || field.closest('[hidden]')) continue;
+
+      if (field.type === 'checkbox') {
+        if (field.checked) return true;
+        continue;
+      }
+
+      if (field.type === 'radio') {
+        if (field.checked && field.id !== 'einling') return true;
+        continue;
+      }
+
+      if (field.tagName === 'SELECT') {
+        const value = String(field.value || '').trim();
+        const text = String(field.options[field.selectedIndex]?.textContent || '').trim().toLowerCase();
+
+        if (
+          value &&
+          !value.startsWith('keine_') &&
+          !text.startsWith('keine ') &&
+          !text.startsWith('kein ') &&
+          !text.includes('bitte auswählen')
+        ) {
+          return true;
+        }
+        continue;
+      }
+
+      if (String(field.value || '').trim() !== '') return true;
+    }
+
+    return false;
+  }
+
+  function refreshCardColor(card) {
+    if (!card) return;
+
+    card.classList.remove('card-empty', 'card-complete');
+
+    if (card.hasAttribute('open')) return;
+
+    if (cardHasRealValue(card)) {
+      card.classList.add('card-complete');
+    } else {
+      card.classList.add('card-empty');
+    }
+  }
+
+  function resetAfterClear() {
+    const lebend = findCard('3_Lebendbilder');
+    const einleitung = findCard('4_Einleitung');
+
+    unlockCard(lebend);
+    unlockCard(einleitung);
+
+    document.querySelectorAll('.card').forEach(function(card){
+      card.removeAttribute('open');
+      refreshCardColor(card);
+      const hint = card.querySelector('.toggle-hint');
+      if (hint && !card.classList.contains('card-disabled')) hint.innerText = 'öffnen';
+    });
+  }
+
+  const clearBtn = document.getElementById('clearBtn');
+  if (clearBtn) {
+    clearBtn.addEventListener('click', function(){
+      setTimeout(resetAfterClear, 180);
+      setTimeout(resetAfterClear, 450);
+    });
+  }
+})();
+</script>
+
+</body>
+</html>
+
+<!-- Ansprechpartner-Logik verbessert -->
