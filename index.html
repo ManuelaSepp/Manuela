@@ -4079,14 +4079,22 @@ const MedizinReportController = {
     const infektErgaenzung = normalisiereZusatz(val("infektErgaenzung"));
     const lines = [];
 
-    if(besonderheitErgaenzung){
-      lines.push("Besonderheiten:\n" + besonderheitErgaenzung);
-    }else if(besonderheitStatus === "Ja"){
+    if(besonderheitStatus === "Ja"){
+      const besonderheitLines = [];
       if(besonderheiten.length){
-        lines.push("Besonderheiten:\n- " + besonderheiten.join("\n- "));
+        besonderheitLines.push("- " + besonderheiten.join("\n- "));
+      }
+      if(besonderheitErgaenzung){
+        besonderheitLines.push(besonderheitErgaenzung);
+      }
+
+      if(besonderheitLines.length){
+        lines.push("Besonderheiten:\n" + besonderheitLines.join("\n"));
       }else{
         lines.push("Besonderheiten sind vorhanden, die genaue Art ist noch nicht ausgewählt.");
       }
+    }else if(besonderheitErgaenzung){
+      lines.push("Besonderheiten:\n" + besonderheitErgaenzung);
     }else if(besonderheitStatus === "Nein"){
       lines.push("Es sind keine äußerlichen Besonderheiten bekannt.");
     }else if(besonderheitStatus === "Unklar"){
