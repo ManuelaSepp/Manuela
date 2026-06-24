@@ -119,7 +119,7 @@ button{
   margin-top:24px;
 }
 .reportbox{
-  color:#7A2E6E;
+  color:#00a651;
   min-height:280px;
   background:#fff;
   border:1px solid #cbd5dc;
@@ -431,7 +431,7 @@ body.admin-mode #abschlussfrageWrapField select{
 
 .bericht p{margin-bottom:0.35em;}
 .report-heading{font-weight:700;}
-.report-call-notice{font-weight:700;font-style:italic;color:#FF00CC!important;display:block;margin-top:0;}
+.report-call-notice{font-weight:700;font-style:italic;display:block;margin-top:0;}
 .report-urgent{font-weight:700;}
 .report-warning{font-weight:700;}
 
@@ -889,7 +889,10 @@ section.step[data-title="Mitarbeiter"]{display:none!important;}
 <option value="noch lebend – Bilder erst nach Versterben">noch lebend – Bilder erst nach Versterben</option>
 <option value="Einleitung">Einleitung</option>
 <option value="Kaiserschnitt">Kaiserschnitt</option>
-</select></div><div class="field-wrap" id="palliativeGeburtWrapField"><label class="option"><input id="palliativeGeburt" type="checkbox" value="Palliative Geburt"/><span>Palliative Geburt</span></label></div><div class="field-wrap" id="alterKindWrapField"><label class="field-label" for="alterKind">Geburtsalter</label><input id="alterKind" inputmode="numeric" maxlength="2" placeholder=""/></div><div class="field-wrap" id="alterEinheitWrapField"><label class="field-label" for="alterEinheit">Einheit des Alters</label><select id="alterEinheit">
+</select></div><div class="field-wrap" id="palliativeGeburtWrapField">
+<label class="option"><input id="palliativeGeburt" type="checkbox" value="Palliative Geburt"/><span>Palliative Geburt</span></label>
+<label class="option hidden" id="stillGeborenWrapField"><input id="stillGeboren" type="checkbox" value="Das Kind wurde bereits still geboren."/><span>Das Kind wurde bereits still geboren.</span></label>
+</div><div class="field-wrap" id="alterKindWrapField"><label class="field-label" for="alterKind">Geburtsalter</label><input id="alterKind" inputmode="numeric" maxlength="2" placeholder=""/></div><div class="field-wrap" id="alterEinheitWrapField"><label class="field-label" for="alterEinheit">Einheit des Alters</label><select id="alterEinheit">
 <option value=""></option>
 <option>SSW</option>
 <option>Monat(e)</option>
@@ -2989,6 +2992,7 @@ function recalcAll(){
   updateInfektBesonderheiten();
   updateKommunikationVisibility();
   updateInfektValidation();
+  updateStillGeborenVisibility();
   clearSituationSpecificValues();
 
   // MASTER_2026-06-14_FIX04:
@@ -4019,7 +4023,7 @@ const HeaderFooterReportController = {
 },
 
   mitarbeiter(){
-  return "Manuela";
+  return "Désirée";
 }
 };
 
@@ -4128,6 +4132,30 @@ const MedizinReportController = {
   }
 };
 
+
+function updateStillGeborenVisibility(){
+  const wrap = $("stillGeborenWrapField");
+  const field = $("stillGeboren");
+  if(!wrap || !field) return;
+
+  const anzeigen = val("aktuelleSituation") === "verstorben";
+
+  if(anzeigen){
+    wrap.classList.remove("hidden");
+  }else{
+    field.checked = false;
+    wrap.classList.add("hidden");
+  }
+}
+
+const StillGeborenReportController = {
+  build(){
+    if(val("aktuelleSituation") !== "verstorben") return "";
+    if(!$("stillGeboren")?.checked) return "";
+    return "Das Kind wurde bereits still geboren.";
+  }
+};
+
 const FamilyImagesReportController = {
   build(){
     return [
@@ -4166,6 +4194,7 @@ const ReportBuilder = {
       HeaderFooterReportController.greeting(),
       ContactReportController.ansprechpartner(),
       SternenkindReportController.build(),
+      StillGeborenReportController.build(),
       FamilyImagesReportController.build(),
       KleidungReportController.build(),
       WaterMethodReportController.build(),
@@ -4196,7 +4225,7 @@ function escapeReportHtml(value){
 
 function renderReportHtml(value){
   return escapeReportHtml(value)
-    .replaceAll("Ruft bitte nochmal an, bevor ihr losfahrt, ob die Bilder noch immer gewünscht werden.", '<strong><em style="color:#FF00CC!important;">Ruft bitte nochmal an, bevor ihr losfahrt, ob die Bilder noch immer gewünscht werden.</em></strong>')
+    .replaceAll("Ruft bitte nochmal an, bevor ihr losfahrt, ob die Bilder noch immer gewünscht werden.", '<strong><em>Ruft bitte nochmal an, bevor ihr losfahrt, ob die Bilder noch immer gewünscht werden.</em></strong>')
     .replaceAll("HIER GEHT ES UM LEBENDBILDER, ES EILT.", '<strong>HIER GEHT ES UM LEBENDBILDER, ES EILT.</strong>')
     .replaceAll("Es sind keine äußerlichen Besonderheiten bekannt.", '<strong>Es sind keine äußerlichen Besonderheiten bekannt.</strong>')
     .replaceAll("Ob äußerliche Besonderheiten vorliegen, ist aktuell nicht bekannt.", '<strong>Ob äußerliche Besonderheiten vorliegen, ist aktuell nicht bekannt.</strong>')
