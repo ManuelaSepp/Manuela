@@ -119,7 +119,7 @@ button{
   margin-top:24px;
 }
 .reportbox{
-  color:#7A2E6E;
+  color:#7A296E;
   min-height:280px;
   background:#fff;
   border:1px solid #cbd5dc;
@@ -431,10 +431,10 @@ body.admin-mode #abschlussfrageWrapField select{
 
 .bericht p{margin-bottom:0.35em;}
 .report-heading{font-weight:700;}
-.report-call-notice{font-weight:700;font-style:italic;color:#BC10A3!important;display:block;margin-top:0;}
+.report-call-notice{font-weight:700;font-style:italic;color:#BB00A3!important;display:block;margin-top:0;}
 .report-urgent{font-weight:700;}
 .report-warning{font-weight:700;}
-.report-alarm-later{color:#7A2E6E;font-weight:600;font-style:italic;}
+.report-alarm{color:#7A296E;font-weight:700;font-style:italic;}
 
 
 /* FIX17: Bericht rechts sticky ab Tablet quer / Desktop */
@@ -898,12 +898,13 @@ section.step[data-title="Mitarbeiter"]{display:none!important;}
 <option>SSW</option>
 <option>Monat(e)</option>
 <option>Jahr(e)</option>
-</select></div><div class="field-wrap" id="grundWrapField"><label class="field-label" for="grund">Grund (DSK-Liste)</label><select id="grund"><option value=""></option></select></div><div class="field-wrap" id="alarmSpaeterWrapField"><label class="option"><input id="alarmSpaeter" type="checkbox" value="Der Alarm erfolgt erst später. Wenn schon jemand weiß, dass er als Ansprechpartner zur Verfügung stehen kann, darf er sich gerne schon melden."/><span>Der Alarm erfolgt erst später.</span></label><div class="lf-hint">Wenn schon jemand weiß, dass er als Ansprechpartner zur Verfügung stehen kann, darf er sich gerne schon melden.</div></div></div><div class="field-wrap" id="sternenkindErgaenzungWrapField" style="margin-top:15px"><label class="field-label" for="sternenkindErgaenzung">Weitere Informationen hier eintragen</label><input id="sternenkindErgaenzung" placeholder=""/></div><div id="sternenkindDynamicGrid"><div class="field-wrap hidden" id="mehrlingeWrapField"><label class="field-label" for="mehrlinge">Zwillinge / Drillinge</label><select id="mehrlinge"><option value=""></option><optgroup label="Zwillinge"><option value="Zwillinge – beide Kinder verstorben">beide Kinder verstorben</option><option value="Zwillinge – ein Kind verstorben, ein Kind lebt">ein Kind verstorben, ein Kind lebt</option><option value="Zwillinge – ein Kind verstorben, ein Kind lebt, Prognose sehr schlecht">ein Kind verstorben, ein Kind lebt, Prognose sehr schlecht</option><option value="Zwillinge – kritischer Zustand eines Kindes">kritischer Zustand eines Kindes</option><option value="Zwillinge – kritischer Zustand beider Kinder">kritischer Zustand beider Kinder</option></optgroup><optgroup label="Drillinge"><option value="Drillinge – drei Kinder verstorben">drei Kinder verstorben</option><option value="Drillinge – ein Kind verstorben, zwei Kinder leben">ein Kind verstorben, zwei Kinder leben</option><option value="Drillinge – zwei Kinder verstorben, ein Kind lebt">zwei Kinder verstorben, ein Kind lebt</option><option value="Drillinge – kritischer Zustand eines Kindes">kritischer Zustand eines Kindes</option><option value="Drillinge – kritischer Zustand zweier Kinder">kritischer Zustand zweier Kinder</option><option value="Drillinge – kritischer Zustand aller Kinder">kritischer Zustand aller Kinder</option></optgroup></select></div><div class="field-wrap hidden" id="lebendbilderPrognoseWrapField"><label class="field-label" for="lebendbilderPrognose">Lebendbilder – Prognose / Situation</label><select id="lebendbilderPrognose"><option value=""></option><option value="Zustand sehr kritisch">Zustand sehr kritisch</option><option value="Überleben nach Einschätzung nicht möglich">Überleben nach Einschätzung nicht möglich</option><option value="Lebenserhaltende Maßnahmen sollen beendet werden">Lebenserhaltende Maßnahmen sollen beendet werden</option><option value="Nur noch palliative Maßnahmen">Nur noch palliative Maßnahmen</option></select></div><div class="field-wrap hidden" id="aktuellesAlterWrapField"><label class="field-label" for="aktuellesAlter">Aktuelles Alter</label><input id="aktuellesAlter" placeholder=""/></div><div class="field-wrap hidden" id="ksElDetailWrapField"><label class="field-label" for="ksElDetail">Details</label><select class="" id="ksElDetail">
+</select></div><div class="field-wrap" id="grundWrapField"><label class="field-label" for="grund">Grund (DSK-Liste)</label><select id="grund"><option value=""></option></select></div></div><div class="field-wrap" id="sternenkindErgaenzungWrapField" style="margin-top:15px"><label class="field-label" for="sternenkindErgaenzung">Weitere Informationen hier eintragen</label><input id="sternenkindErgaenzung" placeholder=""/></div><div id="sternenkindDynamicGrid"><div class="field-wrap hidden" id="mehrlingeWrapField"><label class="field-label" for="mehrlinge">Zwillinge / Drillinge</label><select id="mehrlinge"><option value=""></option><optgroup label="Zwillinge"><option value="Zwillinge – beide Kinder verstorben">beide Kinder verstorben</option><option value="Zwillinge – ein Kind verstorben, ein Kind lebt">ein Kind verstorben, ein Kind lebt</option><option value="Zwillinge – ein Kind verstorben, ein Kind lebt, Prognose sehr schlecht">ein Kind verstorben, ein Kind lebt, Prognose sehr schlecht</option><option value="Zwillinge – kritischer Zustand eines Kindes">kritischer Zustand eines Kindes</option><option value="Zwillinge – kritischer Zustand beider Kinder">kritischer Zustand beider Kinder</option></optgroup><optgroup label="Drillinge"><option value="Drillinge – drei Kinder verstorben">drei Kinder verstorben</option><option value="Drillinge – ein Kind verstorben, zwei Kinder leben">ein Kind verstorben, zwei Kinder leben</option><option value="Drillinge – zwei Kinder verstorben, ein Kind lebt">zwei Kinder verstorben, ein Kind lebt</option><option value="Drillinge – kritischer Zustand eines Kindes">kritischer Zustand eines Kindes</option><option value="Drillinge – kritischer Zustand zweier Kinder">kritischer Zustand zweier Kinder</option><option value="Drillinge – kritischer Zustand aller Kinder">kritischer Zustand aller Kinder</option></optgroup></select></div><div class="field-wrap hidden" id="lebendbilderPrognoseWrapField"><label class="field-label" for="lebendbilderPrognose">Lebendbilder – Prognose / Situation</label><select id="lebendbilderPrognose"><option value=""></option><option value="Zustand sehr kritisch">Zustand sehr kritisch</option><option value="Überleben nach Einschätzung nicht möglich">Überleben nach Einschätzung nicht möglich</option><option value="Lebenserhaltende Maßnahmen sollen beendet werden">Lebenserhaltende Maßnahmen sollen beendet werden</option><option value="Nur noch palliative Maßnahmen">Nur noch palliative Maßnahmen</option></select></div><div class="field-wrap hidden" id="aktuellesAlterWrapField"><label class="field-label" for="aktuellesAlter">Aktuelles Alter</label><input id="aktuellesAlter" placeholder=""/></div><div class="field-wrap hidden" id="ksElDetailWrapField"><label class="field-label" for="ksElDetail">Details</label><select class="" id="ksElDetail">
 <option value=""></option>
 </select></div><div class="field-wrap hidden" id="ksElZeitWrapField"><label class="field-label" for="ksElZeit">Seit wann / ab wann?</label><input id="ksElZeit" placeholder=""/><div class="lf-hint hidden" id="ksElZeitHinweis"></div></div><div class="field-wrap hidden" id="einleitungZusatzWrapField">
 <label class="field-label">Zusatzinfos Einleitung</label>
 <label class="option" id="einleitungWehenWrapField"><input id="einleitungWehen" type="checkbox" value="Es haben bereits Wehen eingesetzt."/><span>Es haben bereits Wehen eingesetzt.</span></label>
 <label class="option" id="geburtNichtAbsehbarWrapField"><input id="geburtNichtAbsehbar" type="checkbox" value="Wann die Geburt stattfinden wird, ist aktuell noch nicht absehbar."/><span>Wann die Geburt stattfinden wird, ist aktuell noch nicht absehbar.</span></label>
+<label class="option" id="alarmSpaeterWrapField"><input id="alarmSpaeter" type="checkbox" value="Falls sich bereits jemand als Ansprechperson bereithalten kann, freue ich mich über eine kurze Rückmeldung."/><span>Alarm später</span></label>
 </div><div id="wasserWrap">
 <div class="field-wrap" id="wasserWrapField"><label class="field-label" for="wasser">Wassermethode</label><select id="wasser">
 <option value=""></option>
@@ -2863,7 +2864,7 @@ async function copyReport(){
     return;
   }
 
-  const htmlContent = '<div style="font-family:Arial, Helvetica, sans-serif; white-space:normal; line-height:1.46; color:#7A2E6E;">' + rawHtml + '</div>';
+  const htmlContent = '<div style="font-family:Arial, Helvetica, sans-serif; white-space:normal; line-height:1.46; color:#7A296E;">' + rawHtml + '</div>';
   const htmlDoc = '<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>' + htmlContent + '</body></html>';
 
   try{
@@ -2885,7 +2886,7 @@ async function copyReport(){
     holder.style.position = "fixed";
     holder.style.left = "-9999px";
     holder.style.top = "0";
-    holder.style.color = "#7A2E6E";
+    holder.style.color = "#7A296E";
     holder.style.fontFamily = "Arial, Helvetica, sans-serif";
     holder.style.lineHeight = "1.46";
     holder.innerHTML = htmlContent;
@@ -3005,6 +3006,7 @@ function recalcAll(){
   updateSituationByMehrlingsRegel();
   adminRevealDynamicFields();
   enforceAdminLogicGuards();
+  syncAlarmSpaeterVisibilityForPalliativeEinleitung();
   updateReport();
 
   if($("report")){
@@ -4035,7 +4037,7 @@ const HeaderFooterReportController = {
 
   alarmSpaeter(){
   return $("alarmSpaeter")?.checked
-    ? "Der Alarm erfolgt erst später. Wenn schon jemand weiß, dass er als Ansprechpartner zur Verfügung stehen kann, darf er sich gerne schon melden."
+    ? "Falls sich bereits jemand als Ansprechperson bereithalten kann, freue ich mich über eine kurze Rückmeldung."
     : "";
 }
 };
@@ -4245,9 +4247,9 @@ const ReportBuilder = {
       ]),
       this.buildCompactGroup([
         HeaderFooterReportController.footer(),
-        HeaderFooterReportController.mitarbeiter(),
-        HeaderFooterReportController.alarmSpaeter()
-      ])
+        HeaderFooterReportController.mitarbeiter()
+      ]),
+      HeaderFooterReportController.alarmSpaeter()
     ].forEach(text => this.addUniqueBlock(blocks, seen, text));
 
     return blocks.join("\n\n");
@@ -4270,14 +4272,14 @@ function escapeReportHtml(value){
 
 function renderReportHtml(value){
   return escapeReportHtml(value)
-    .replaceAll("Ruft bitte nochmal an, bevor ihr losfahrt, ob die Bilder noch immer gewünscht werden.", '<strong><em style="color:#BC10A3!important;">Ruft bitte nochmal an, bevor ihr losfahrt, ob die Bilder noch immer gewünscht werden.</em></strong>')
+    .replaceAll("Ruft bitte nochmal an, bevor ihr losfahrt, ob die Bilder noch immer gewünscht werden.", '<strong><em style="color:#BB00A3!important;">Ruft bitte nochmal an, bevor ihr losfahrt, ob die Bilder noch immer gewünscht werden.</em></strong>')
     .replaceAll("HIER GEHT ES UM LEBENDBILDER, ES EILT.", '<strong>HIER GEHT ES UM LEBENDBILDER, ES EILT.</strong>')
     .replaceAll("Es sind keine äußerlichen Besonderheiten bekannt.", '<strong>Es sind keine äußerlichen Besonderheiten bekannt.</strong>')
     .replaceAll("Ob äußerliche Besonderheiten vorliegen, ist aktuell nicht bekannt.", '<strong>Ob äußerliche Besonderheiten vorliegen, ist aktuell nicht bekannt.</strong>')
     .replaceAll("Es sind keine Infekte bekannt.", '<strong>Es sind keine Infekte bekannt.</strong>')
     .replaceAll("Ob Infekte vorliegen, ist aktuell nicht bekannt.", '<strong>Ob Infekte vorliegen, ist aktuell nicht bekannt.</strong>')
     .replaceAll("Beim Punkt Infekte muss Ja, Nein, Unklar oder ein freier Texteintrag vorhanden sein.", '<strong>Beim Punkt Infekte muss Ja, Nein, Unklar oder ein freier Texteintrag vorhanden sein.</strong>')
-    .replaceAll("Der Alarm erfolgt erst später. Wenn schon jemand weiß, dass er als Ansprechpartner zur Verfügung stehen kann, darf er sich gerne schon melden.", '<strong><em style="color:#7A2E6E!important;">Der Alarm erfolgt erst später. Wenn schon jemand weiß, dass er als Ansprechpartner zur Verfügung stehen kann, darf er sich gerne schon melden.</em></strong>')
+    .replaceAll("Falls sich bereits jemand als Ansprechperson bereithalten kann, freue ich mich über eine kurze Rückmeldung.", '<strong><em style="color:#7A296E!important;">Falls sich bereits jemand als Ansprechperson bereithalten kann, freue ich mich über eine kurze Rückmeldung.</em></strong>')
     .replaceAll("Besonderheiten:", '<strong>Besonderheiten:</strong>')
     .replaceAll("Bekannte Infekte:", '<strong>Bekannte Infekte:</strong>')
     .replaceAll("\n", "<br>");
@@ -4511,6 +4513,22 @@ document.addEventListener('change', function(e){
   }
 });
 
+
+
+function syncAlarmSpaeterVisibilityForPalliativeEinleitung(){
+  const wrap = document.getElementById("alarmSpaeterWrapField");
+  const parent = document.getElementById("einleitungZusatzWrapField");
+  if(!wrap || !parent) return;
+
+  const isEinleitung = val("aktuelleSituation") === "Einleitung";
+  const isPalliativEinleitung = document.getElementById("palliativeGeburt")?.checked && val("aktuelleSituation") === "Einleitung";
+
+  wrap.classList.toggle("hidden", !(isEinleitung || isPalliativEinleitung));
+  if(isEinleitung || isPalliativEinleitung){
+    parent.classList.remove("hidden");
+  }
+}
+
 </script>
 
 <script>
@@ -4580,6 +4598,22 @@ document.addEventListener('change', function(e){
   window.addEventListener("load", syncGeschlechtDropdown);
   syncGeschlechtDropdown();
 })();
+
+
+function syncAlarmSpaeterVisibilityForPalliativeEinleitung(){
+  const wrap = document.getElementById("alarmSpaeterWrapField");
+  const parent = document.getElementById("einleitungZusatzWrapField");
+  if(!wrap || !parent) return;
+
+  const isEinleitung = val("aktuelleSituation") === "Einleitung";
+  const isPalliativEinleitung = document.getElementById("palliativeGeburt")?.checked && val("aktuelleSituation") === "Einleitung";
+
+  wrap.classList.toggle("hidden", !(isEinleitung || isPalliativEinleitung));
+  if(isEinleitung || isPalliativEinleitung){
+    parent.classList.remove("hidden");
+  }
+}
+
 </script>
 
 
@@ -4621,6 +4655,22 @@ document.addEventListener('change', function(e){
 
   window.addEventListener('load', updateWasserOptionen);
 })();
+
+
+function syncAlarmSpaeterVisibilityForPalliativeEinleitung(){
+  const wrap = document.getElementById("alarmSpaeterWrapField");
+  const parent = document.getElementById("einleitungZusatzWrapField");
+  if(!wrap || !parent) return;
+
+  const isEinleitung = val("aktuelleSituation") === "Einleitung";
+  const isPalliativEinleitung = document.getElementById("palliativeGeburt")?.checked && val("aktuelleSituation") === "Einleitung";
+
+  wrap.classList.toggle("hidden", !(isEinleitung || isPalliativEinleitung));
+  if(isEinleitung || isPalliativEinleitung){
+    parent.classList.remove("hidden");
+  }
+}
+
 </script>
 
 
@@ -4639,6 +4689,22 @@ document.addEventListener('DOMContentLoaded',function(){
  const feld=document.getElementById('aktuellesAlter');
  if(cb&&wrap&&feld&&cb.checked){ feld.value=''; wrap.classList.add('hidden');}
 });
+
+
+function syncAlarmSpaeterVisibilityForPalliativeEinleitung(){
+  const wrap = document.getElementById("alarmSpaeterWrapField");
+  const parent = document.getElementById("einleitungZusatzWrapField");
+  if(!wrap || !parent) return;
+
+  const isEinleitung = val("aktuelleSituation") === "Einleitung";
+  const isPalliativEinleitung = document.getElementById("palliativeGeburt")?.checked && val("aktuelleSituation") === "Einleitung";
+
+  wrap.classList.toggle("hidden", !(isEinleitung || isPalliativEinleitung));
+  if(isEinleitung || isPalliativEinleitung){
+    parent.classList.remove("hidden");
+  }
+}
+
 </script>
 
 
@@ -4683,6 +4749,22 @@ document.addEventListener('DOMContentLoaded',function(){
   window.addEventListener('load', apply);
   setTimeout(apply, 0);
 })();
+
+
+function syncAlarmSpaeterVisibilityForPalliativeEinleitung(){
+  const wrap = document.getElementById("alarmSpaeterWrapField");
+  const parent = document.getElementById("einleitungZusatzWrapField");
+  if(!wrap || !parent) return;
+
+  const isEinleitung = val("aktuelleSituation") === "Einleitung";
+  const isPalliativEinleitung = document.getElementById("palliativeGeburt")?.checked && val("aktuelleSituation") === "Einleitung";
+
+  wrap.classList.toggle("hidden", !(isEinleitung || isPalliativEinleitung));
+  if(isEinleitung || isPalliativEinleitung){
+    parent.classList.remove("hidden");
+  }
+}
+
 </script>
 
 </body>
