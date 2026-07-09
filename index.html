@@ -904,7 +904,7 @@ section.step[data-title="Mitarbeiter"]{display:none!important;}
 <label class="field-label">Zusatzinfos Einleitung</label>
 <label class="option" id="einleitungWehenWrapField"><input id="einleitungWehen" type="checkbox" value="Es haben bereits Wehen eingesetzt."/><span>Es haben bereits Wehen eingesetzt.</span></label>
 <label class="option" id="geburtNichtAbsehbarWrapField"><input id="geburtNichtAbsehbar" type="checkbox" value="Wann die Geburt stattfinden wird, ist aktuell noch nicht absehbar."/><span>Wann die Geburt stattfinden wird, ist aktuell noch nicht absehbar.</span></label>
-<label class="option" id="alarmSpaeterWrapField"><input id="alarmSpaeter" type="checkbox" value="Falls sich bereits jemand als Ansprechperson bereithalten kann, freue ich mich über eine kurze Rückmeldung."/><span>Alarm später</span></label>
+<label class="option" id="alarmSpaeterWrapField"><input id="alarmSpaeter" type="checkbox" value="Hier wird erst später alarmiert.&#10;Falls sich bereits jemand als Ansprechperson bereithalten kann, freue ich mich über eine kurze Rückmeldung."/><span>Alarm später</span></label>
 </div><div id="wasserWrap">
 <div class="field-wrap" id="wasserWrapField"><label class="field-label" for="wasser">Wassermethode</label><select id="wasser">
 <option value=""></option>
@@ -1554,6 +1554,7 @@ function getKindNameParts(){
   if(!raw) return [];
 
   return raw
+    .replace(/\s+und\s+/giu, ",")
     .split(/[^\p{L}\s-]+/u)
     .map(part => part.trim())
     .filter(Boolean);
@@ -1920,13 +1921,15 @@ function setWasserOptions(mode){
       ["Nein", "Nein"],
       ["Unklar", "Unklar"],
       ["Nach Geburt", "Nach Geburt"],
-      ["Nach Geburt unklar", "Nach Geburt unklar"],
+      
+      ["Nicht nach Geburt", "Nicht nach Geburt"],["Nach Geburt unklar", "Nach Geburt unklar"],
       ["Nach Versterben", "Nach Versterben"],
       ["Nach Versterben unklar", "Nach Versterben unklar"]
     ],
     nachGeburt: [
       ["", ""],
       ["Nach Geburt", "Nach Geburt"],
+      ["Nicht nach Geburt", "Nicht nach Geburt"],
       ["Nach Geburt unklar", "Nach Geburt unklar"]
     ],
     nachVersterben: [
@@ -3215,11 +3218,11 @@ function baueFamiliensatz(){
   let satz = "";
 
   if(mehrlinge.startsWith("Zwillinge")){
-    satz = `${bezug.fuer} wären die Zwillinge das ${ord[base]} und ${ord[base + 1]}${(val("familienSituation")||"Eltern")==="Eltern" ? " Kind der Familie." : " Kind."}`;
+    satz = `${bezug.fuer} sind die Zwillinge das ${ord[base]} und ${ord[base + 1]}${(val("familienSituation")||"Eltern")==="Eltern" ? " Kind der Familie." : " Kind."}`;
   }else if(mehrlinge.startsWith("Drillinge")){
-    satz = `${bezug.fuer} wären die Drillinge das ${ord[base]}, ${ord[base + 1]} und ${ord[base + 2]}${(val("familienSituation")||"Eltern")==="Eltern" ? " Kind der Familie." : " Kind."}`;
+    satz = `${bezug.fuer} sind die Drillinge das ${ord[base]}, ${ord[base + 1]} und ${ord[base + 2]}${(val("familienSituation")||"Eltern")==="Eltern" ? " Kind der Familie." : " Kind."}`;
   }else{
-    satz = `${bezug.fuer} wäre es das ${ord[base]}${(val("familienSituation")||"Eltern")==="Eltern" ? " Kind der Familie." : " Kind."}`;
+    satz = `${bezug.fuer} ist es das ${ord[base]}${(val("familienSituation")||"Eltern")==="Eltern" ? " Kind der Familie." : " Kind."}`;
   }
 
   const handText = handMap[hand];
@@ -3507,6 +3510,10 @@ function baueWasserSatz(){
 
   if(wasser === "Nach Geburt"){
     return "Nach der Geburt soll für " + bezug + " die Wassermethode angewendet werden.";
+  }
+
+  if(wasser === "Nicht nach Geburt"){
+    return "Die Wassermethode wird nicht nach der Geburt angewendet.";
   }
 
   if(wasser === "Nach Geburt unklar"){
@@ -4037,7 +4044,7 @@ const HeaderFooterReportController = {
 
   alarmSpaeter(){
   return $("alarmSpaeter")?.checked
-    ? "Falls sich bereits jemand als Ansprechperson bereithalten kann, freue ich mich über eine kurze Rückmeldung."
+    ? "Hier wird erst später alarmiert.\nFalls sich bereits jemand als Ansprechperson bereithalten kann, freue ich mich über eine kurze Rückmeldung."
     : "";
 }
 };
@@ -4279,9 +4286,9 @@ function renderReportHtml(value){
     .replaceAll("Es sind keine Infekte bekannt.", '<strong>Es sind keine Infekte bekannt.</strong>')
     .replaceAll("Ob Infekte vorliegen, ist aktuell nicht bekannt.", '<strong>Ob Infekte vorliegen, ist aktuell nicht bekannt.</strong>')
     .replaceAll("Beim Punkt Infekte muss Ja, Nein, Unklar oder ein freier Texteintrag vorhanden sein.", '<strong>Beim Punkt Infekte muss Ja, Nein, Unklar oder ein freier Texteintrag vorhanden sein.</strong>')
-    .replaceAll("Falls sich bereits jemand als Ansprechperson bereithalten kann, freue ich mich über eine kurze Rückmeldung.", '<strong><em style="color:#7A296E!important;">Falls sich bereits jemand als Ansprechperson bereithalten kann, freue ich mich über eine kurze Rückmeldung.</em></strong>')
     .replaceAll("Besonderheiten:", '<strong>Besonderheiten:</strong>')
     .replaceAll("Bekannte Infekte:", '<strong>Bekannte Infekte:</strong>')
+    .replaceAll("Hier wird erst später alarmiert.\nFalls sich bereits jemand als Ansprechperson bereithalten kann, freue ich mich über eine kurze Rückmeldung.", '<strong><em style="color:#7A296E!important;">Hier wird erst später alarmiert.<br>Falls sich bereits jemand als Ansprechperson bereithalten kann, freue ich mich über eine kurze Rückmeldung.</em></strong>')
     .replaceAll("\n", "<br>");
 }
 
@@ -4631,7 +4638,7 @@ function syncAlarmSpaeterVisibilityForPalliativeEinleitung(){
     if(situation === 'verstorben'){
       options = ['', 'Ja', 'Nein', 'Unklar'];
     } else if(situation === 'Einleitung' || situation === 'Kaiserschnitt'){
-      options = ['', 'Nach Geburt', 'Nach Geburt unklar'];
+      options = ['', 'Nach Geburt', 'Nicht nach Geburt', 'Nach Geburt unklar'];
     } else {
       return;
     }
