@@ -856,7 +856,7 @@ section.step[data-title="Mitarbeiter"]{display:none!important;}
 <h2>Ansprechpartner/in vor Ort</h2>
 <div class="grid3">
 <div class="field-wrap" id="ansprechpartnerWrapField"><label class="field-label" for="ansprechpartner">Name Ansprechpartner/in</label><input id="ansprechpartner" placeholder="Name Ansprechpartner/in"/></div>
-<div class="field-wrap" id="funktionWrapField"><label class="field-label" for="funktion">Funktion</label><select id="funktion"><option value=""></option><option value="Papa">Papa</option><option value="Mama">Mama</option><option value="Oma">Oma</option><option value="Freundin">Freundin</option><option value="Familienangehörige/r">Familienangehörige/r</option><option value="Hebamme">Hebamme</option><option value="Schwester">Schwester</option><option value="Ärztin">Ärztin</option><option value="Arzt">Arzt</option><option value="Frau von der Seelsorge">Frau von der Seelsorge</option><option value="Herr von der Seelsorge">Herr von der Seelsorge</option><option value="Sozialdienst">Sozialdienst</option><option value="Bestattungsinstitut">Bestattungsinstitut</option></select></div>
+<div class="field-wrap" id="funktionWrapField"><label class="field-label" for="funktion">Funktion</label><select id="funktion"><option value=""></option><option value="Papa">Papa</option><option value="Mama">Mama</option><option value="Oma">Oma</option><option value="Freundin">Freundin</option><option value="Familienangehörige/r">Familienangehörige/r</option><option value="Hebamme">Hebamme</option><option value="Schwester">Schwester</option><option value="Ärztin">Ärztin</option><option value="Arzt">Arzt</option><option value="Frau von der Seelsorge">Frau von der Seelsorge</option><option value="Herr von der Seelsorge">Herr von der Seelsorge</option><option value="Sozialdienst">Sozialdienst</option><option value="Sternenkinder Saarland">Sternenkinder Saarland</option><option value="Bestattungsinstitut">Bestattungsinstitut</option></select></div>
 <div class="field-wrap" id="gespraechWrapField"><label class="field-label" for="gespraech">Gesprächssituation</label><select id="gespraech"><option value=""></option><option value="aufgelöst">aufgelöst</option><option value="besorgt">besorgt</option><option value="dankbar">dankbar</option><option value="lieb">lieb</option><option value="nett">nett</option><option value="ruhig">ruhig</option><option value="traurig">traurig</option><option value="verzweifelt">verzweifelt</option></select></div>
 </div>
 <div class="grid2" style="margin-top:15px">
@@ -1006,7 +1006,7 @@ Die Wassermethode kann helfen, die Haut zu stabilisieren.</p>
 <option value="Wer kann sich denn hier bereithalten und als Ansprechpartner zur Verfügung stehen?">Wer kann sich denn hier bereithalten und als Ansprechpartner zur Verfügung stehen?</option>
 <option value="Wer kann sich hier bereithalten und als Ansprechpartner zur Verfügung stehen?">Wer kann sich hier bereithalten und als Ansprechpartner zur Verfügung stehen?</option>
 <option value="Wer kann sofort los?">Wer kann sofort los?</option>
-<option value="Wer kann denn hier übernehmen?">Wer kann denn hier übernehmen?</option>
+<option value="Wer kann übernehmen?">Wer kann übernehmen?</option>
 </select></div>
 <div class="field-wrap" id="vorLosfahrtWrapField"><label class="option"><input id="vorLosfahrtAnrufen" type="checkbox" value="Ruft auf jeden Fall nochmal an bevor ihr losfahrt, ob die Bilder noch immer gewünscht werden."/><span>Vor Losfahrt nochmal anrufen</span></label></div>
 </div>
@@ -2277,7 +2277,7 @@ function updateAbschlussfragenOptions(){
 
   const bereithalten = "Wer kann sich denn hier bereithalten und als Ansprechpartner zur Verfügung stehen?";
   const sofortLos = "Wer kann sofort los?";
-  const uebernehmen = "Wer kann denn hier übernehmen?";
+  const uebernehmen = "Wer kann übernehmen?";
 
   let frage = "";
 
@@ -3329,6 +3329,11 @@ const APRoleModel = Object.freeze({
       noNamePattern:"{article} {adj}Sozialdienst",
       custom:"sozialdienst"
     }),
+    "Sternenkinder Saarland": Object.freeze({
+      usesSituation:false,
+      noSituationPattern:"{name} von Sternenkinder Saarland",
+      noNamePattern:"Sternenkinder Saarland"
+    }),
     "Bestattungsinstitut": Object.freeze({
       usesSituation:true,
       articleWithSituation:"dem",
@@ -3438,16 +3443,16 @@ const APRoleController = {
 
     if(type === "sozialdienst"){
       if(useSituation){
-        return APTextFormatter.clean(article + " " + adj + (isFirstName ? name : "Frau " + name) + " vom Sozialdienst");
+        return APTextFormatter.clean(article + " " + adj + name + " vom Sozialdienst");
       }
-      return APTextFormatter.clean((isFirstName ? name : "Frau " + name) + " vom Sozialdienst");
+      return APTextFormatter.clean(name + " vom Sozialdienst");
     }
 
     if(type === "bestattungsinstitut"){
       if(useSituation){
-        return APTextFormatter.clean(article + " " + adj + (isFirstName ? name : "Frau " + name) + " vom Bestattungsinstitut");
+        return APTextFormatter.clean(article + " " + adj + name + " vom Bestattungsinstitut");
       }
-      return APTextFormatter.clean((isFirstName ? name : "Frau " + name) + " vom Bestattungsinstitut");
+      return APTextFormatter.clean(name + " vom Bestattungsinstitut");
     }
 
     return name;
