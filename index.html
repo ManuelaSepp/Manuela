@@ -891,23 +891,7 @@ section.step[data-title="Mitarbeiter"]{display:none!important;}
 </section>
 <section class="step" data-title="Sternenkind">
 <h2>Angaben zum Sternenkind</h2>
-<div class="grid3"><div class="field-wrap" id="elternWrapField"><label class="field-label" for="eltern">Namen der Eltern</label><input id="eltern" placeholder="Namen der Eltern"/></div><div class="field-wrap" id="kindNameWrapField"><label class="field-label" for="kindName">Vorname des Kindes / der Kinder (optional)</label><input id="kindName" placeholder="Vorname des Kindes / der Kinder (optional)"/></div><div class="field-wrap" id="geschlechtWrapField"><label class="field-label" for="geschlecht">Geschlecht des Kindes</label><select id="geschlecht">
-<option value=""></option>
-<option value="Mädchen">Mädchen</option>
-<option value="Junge">Junge</option>
-<option value="Unbekannt">Unbekannt</option>
-<optgroup label="Zwillinge">
-<option value="MM">Zwillinge (MM)</option>
-<option value="JJ">Zwillinge (JJ)</option>
-<option value="MJ">Zwillinge (MJ)</option>
-</optgroup>
-<optgroup label="Drillinge">
-<option value="MMM">Drillinge (MMM)</option>
-<option value="JJJ">Drillinge (JJJ)</option>
-<option value="MMJ">Drillinge (MMJ)</option>
-<option value="JJM">Drillinge (JJM)</option>
-</optgroup>
-</select></div><div class="field-wrap" id="aktuelleSituationWrapField"><label class="field-label" for="aktuelleSituation">Aktuelle Situation des Kindes</label><select id="aktuelleSituation">
+<div class="grid3"><div class="field-wrap" id="kindAnzahlWrapField"><label class="field-label" for="kindAnzahl">Anzahl der Kinder</label><select id="kindAnzahl"><option value="1">1 Kind</option><option value="2">2 Kinder</option><option value="3">3 Kinder</option></select></div><div class="field-wrap" id="aktuelleSituationWrapField"><label class="field-label" for="aktuelleSituation">Aktuelle Situation des Kindes</label><select id="aktuelleSituation">
 <option value=""></option>
 <option value="verstorben">verstorben</option>
 <option value="Lebendbilder">Lebendbilder</option>
@@ -1597,9 +1581,9 @@ function getKindNameParts(){
 }
 
 function detectedKindCount(){
-  const parts = getKindNameParts();
-  if(parts.length >= 3) return 3;
-  if(parts.length === 2) return 2;
+  const count = Number(val("kindAnzahl"));
+  if(count >= 3) return 3;
+  if(count === 2) return 2;
   return 1;
 }
 
