@@ -814,6 +814,31 @@ body.consent-ok section.step[data-title="Einverständnis"] h2{
 }
 
 
+/* TEST_KLINIK_OPTIONAL: Klinik standardmäßig geschlossen, nur per Klick öffnen */
+.step.optional-klinik{
+  display:block!important;
+  padding:1px 0!important;
+  margin:0!important;
+  border-bottom:0!important;
+}
+.step.optional-klinik:not(.klinik-open) > *:not(h2){
+  display:none!important;
+}
+.step.optional-klinik:not(.klinik-open) h2{
+  cursor:pointer;
+  margin:0!important;
+  padding:7px 12px!important;
+  border:1px solid var(--line);
+  border-radius:8px;
+  background:#ffffff;
+}
+.step.optional-klinik.klinik-open{
+  display:block!important;
+}
+.step.optional-klinik.klinik-open h2{
+  cursor:pointer;
+}
+
 /* FIX20C: Désirée-Version ohne Mitarbeiter-Schritt */
 section.step[data-title="Mitarbeiter"]{display:none!important;}
 </style>
@@ -836,7 +861,7 @@ section.step[data-title="Mitarbeiter"]{display:none!important;}
 <div class="field-wrap" id="mitarbeiterWrapField"><label class="field-label" for="mitarbeiter">Mitarbeiter/in *</label><div class="lf-hint">Bitte nur Buchstaben verwenden.</div><input id="mitarbeiter" placeholder="" required="required"/><div class="lf-hint" id="mitarbeiterEnterHinweis">Zum Absenden Enter drücken.</div></div><div class="notice" id="mitarbeiterPflichtHinweis">Bitte Mitarbeiter/in eintragen.</div>
 <div class="nav"><button class="btn-next" onclick="nextStep()">Weiter</button></div>
 </section>
-<section class="step" data-title="Klinik">
+<section class="step optional-klinik" data-title="Klinik">
 <h2>Angaben zur Klinik oder zum Ort der Geburt</h2>
 <div class="grid2">
 <div class="field-wrap" id="klinikModusWrapField"><label class="field-label" for="klinikModus">Klinik auswählen / manuell eingeben</label><select id="klinikModus">
@@ -860,8 +885,7 @@ section.step[data-title="Mitarbeiter"]{display:none!important;}
 <div class="field-wrap" id="gespraechWrapField"><label class="field-label" for="gespraech">Gesprächssituation</label><select id="gespraech"><option value=""></option><option value="aufgelöst">aufgelöst</option><option value="besorgt">besorgt</option><option value="dankbar">dankbar</option><option value="lieb">lieb</option><option value="nett">nett</option><option value="ruhig">ruhig</option><option value="traurig">traurig</option><option value="verzweifelt">verzweifelt</option></select></div>
 </div>
 <div class="grid2" style="margin-top:15px">
-<div class="field-wrap" id="telefonWrapField"><label class="field-label" for="telefon">Telefon / Mobil</label><input id="telefon" placeholder="Telefon / Mobil"/></div>
-<div class="field-wrap" id="emailWrapField"><label class="field-label" for="email">E-Mail</label><input id="email" placeholder="E-Mail"/></div><div class="grid2" style="align-items:end"><div class="field-wrap" id="ansprechpartnerErgaenzungWrapField"><label class="field-label" for="ansprechpartnerErgaenzung">Weitere Informationen hier eintragen</label><input class="small-note-field" id="ansprechpartnerErgaenzung" placeholder=""/></div><div class="field-wrap" id="informationslageUnklarWrapField"><label class="option"><input id="informationslageUnklar" type="checkbox"/><span>Informationslage unklar</span></label></div></div>
+<div class="grid2" style="align-items:end"><div class="field-wrap" id="ansprechpartnerErgaenzungWrapField"><label class="field-label" for="ansprechpartnerErgaenzung">Weitere Informationen hier eintragen</label><input class="small-note-field" id="ansprechpartnerErgaenzung" placeholder=""/></div><div class="field-wrap" id="informationslageUnklarWrapField"><label class="option"><input id="informationslageUnklar" type="checkbox"/><span>Informationslage unklar</span></label></div></div>
 </div>
 <div class="nav"><button class="btn-prev" onclick="prevStep()">Zurück</button><button class="btn-next" onclick="nextStep()">Weiter</button></div>
 </section>
@@ -893,12 +917,7 @@ section.step[data-title="Mitarbeiter"]{display:none!important;}
 </select></div><div class="field-wrap" id="palliativeGeburtWrapField">
 <label class="option"><input id="palliativeGeburt" type="checkbox" value="Palliative Geburt"/><span>Palliative Geburt</span></label>
 <label class="option hidden" id="stillGeborenWrapField"><input id="stillGeboren" type="checkbox" value="Das Kind wurde bereits still geboren."/><span>Das Kind wurde bereits still geboren.</span></label>
-</div><div class="field-wrap" id="alterKindWrapField"><label class="field-label" for="alterKind">Geburtsalter</label><input id="alterKind" inputmode="numeric" maxlength="2" placeholder=""/></div><div class="field-wrap" id="alterEinheitWrapField"><label class="field-label" for="alterEinheit">Einheit des Alters</label><select id="alterEinheit">
-<option value=""></option>
-<option>SSW</option>
-<option>Monat(e)</option>
-<option>Jahr(e)</option>
-</select></div><div class="field-wrap" id="grundWrapField"><label class="field-label" for="grund">Grund (DSK-Liste)</label><select id="grund"><option value=""></option></select></div></div><div class="field-wrap" id="sternenkindErgaenzungWrapField" style="margin-top:15px"><label class="field-label" for="sternenkindErgaenzung">Weitere Informationen hier eintragen</label><input id="sternenkindErgaenzung" placeholder=""/></div><div id="sternenkindDynamicGrid"><div class="field-wrap hidden" id="mehrlingeWrapField"><label class="field-label" for="mehrlinge">Zwillinge / Drillinge</label><select id="mehrlinge"><option value=""></option><optgroup label="Zwillinge"><option value="Zwillinge – beide Kinder verstorben">beide Kinder verstorben</option><option value="Zwillinge – ein Kind verstorben, ein Kind lebt">ein Kind verstorben, ein Kind lebt</option><option value="Zwillinge – ein Kind verstorben, ein Kind lebt, Prognose sehr schlecht">ein Kind verstorben, ein Kind lebt, Prognose sehr schlecht</option><option value="Zwillinge – kritischer Zustand eines Kindes">kritischer Zustand eines Kindes</option><option value="Zwillinge – kritischer Zustand beider Kinder">kritischer Zustand beider Kinder</option></optgroup><optgroup label="Drillinge"><option value="Drillinge – drei Kinder verstorben">drei Kinder verstorben</option><option value="Drillinge – ein Kind verstorben, zwei Kinder leben">ein Kind verstorben, zwei Kinder leben</option><option value="Drillinge – zwei Kinder verstorben, ein Kind lebt">zwei Kinder verstorben, ein Kind lebt</option><option value="Drillinge – kritischer Zustand eines Kindes">kritischer Zustand eines Kindes</option><option value="Drillinge – kritischer Zustand zweier Kinder">kritischer Zustand zweier Kinder</option><option value="Drillinge – kritischer Zustand aller Kinder">kritischer Zustand aller Kinder</option></optgroup></select></div><div class="field-wrap hidden" id="lebendbilderPrognoseWrapField"><label class="field-label" for="lebendbilderPrognose">Lebendbilder – Prognose / Situation</label><select id="lebendbilderPrognose"><option value=""></option><option value="Zustand sehr kritisch">Zustand sehr kritisch</option><option value="Überleben nach Einschätzung nicht möglich">Überleben nach Einschätzung nicht möglich</option><option value="Lebenserhaltende Maßnahmen sollen beendet werden">Lebenserhaltende Maßnahmen sollen beendet werden</option><option value="Nur noch palliative Maßnahmen">Nur noch palliative Maßnahmen</option></select></div><div class="field-wrap hidden" id="aktuellesAlterWrapField"><label class="field-label" for="aktuellesAlter">Aktuelles Alter</label><input id="aktuellesAlter" placeholder=""/></div><div class="field-wrap hidden" id="ksElDetailWrapField"><label class="field-label" for="ksElDetail">Details</label><select class="" id="ksElDetail">
+</div></div><div class="field-wrap" id="sternenkindErgaenzungWrapField" style="margin-top:15px"><label class="field-label" for="sternenkindErgaenzung">Weitere Informationen hier eintragen</label><input id="sternenkindErgaenzung" placeholder=""/></div><div id="sternenkindDynamicGrid"><div class="field-wrap hidden" id="mehrlingeWrapField"><label class="field-label" for="mehrlinge">Zwillinge / Drillinge</label><select id="mehrlinge"><option value=""></option><optgroup label="Zwillinge"><option value="Zwillinge – beide Kinder verstorben">beide Kinder verstorben</option><option value="Zwillinge – ein Kind verstorben, ein Kind lebt">ein Kind verstorben, ein Kind lebt</option><option value="Zwillinge – ein Kind verstorben, ein Kind lebt, Prognose sehr schlecht">ein Kind verstorben, ein Kind lebt, Prognose sehr schlecht</option><option value="Zwillinge – kritischer Zustand eines Kindes">kritischer Zustand eines Kindes</option><option value="Zwillinge – kritischer Zustand beider Kinder">kritischer Zustand beider Kinder</option></optgroup><optgroup label="Drillinge"><option value="Drillinge – drei Kinder verstorben">drei Kinder verstorben</option><option value="Drillinge – ein Kind verstorben, zwei Kinder leben">ein Kind verstorben, zwei Kinder leben</option><option value="Drillinge – zwei Kinder verstorben, ein Kind lebt">zwei Kinder verstorben, ein Kind lebt</option><option value="Drillinge – kritischer Zustand eines Kindes">kritischer Zustand eines Kindes</option><option value="Drillinge – kritischer Zustand zweier Kinder">kritischer Zustand zweier Kinder</option><option value="Drillinge – kritischer Zustand aller Kinder">kritischer Zustand aller Kinder</option></optgroup></select></div><div class="field-wrap hidden" id="lebendbilderPrognoseWrapField"><label class="field-label" for="lebendbilderPrognose">Lebendbilder – Prognose / Situation</label><select id="lebendbilderPrognose"><option value=""></option><option value="Zustand sehr kritisch">Zustand sehr kritisch</option><option value="Überleben nach Einschätzung nicht möglich">Überleben nach Einschätzung nicht möglich</option><option value="Lebenserhaltende Maßnahmen sollen beendet werden">Lebenserhaltende Maßnahmen sollen beendet werden</option><option value="Nur noch palliative Maßnahmen">Nur noch palliative Maßnahmen</option></select></div><div class="field-wrap hidden" id="aktuellesAlterWrapField"><label class="field-label" for="aktuellesAlter">Aktuelles Alter</label><input id="aktuellesAlter" placeholder=""/></div><div class="field-wrap hidden" id="ksElDetailWrapField"><label class="field-label" for="ksElDetail">Details</label><select class="" id="ksElDetail">
 <option value=""></option>
 </select></div><div class="field-wrap hidden" id="ksElZeitWrapField"><label class="field-label" for="ksElZeit">Seit wann / ab wann?</label><input id="ksElZeit" placeholder=""/><div class="lf-hint hidden" id="ksElZeitHinweis"></div></div><div class="field-wrap hidden" id="einleitungZusatzWrapField">
 <label class="field-label">Zusatzinfos Einleitung</label>
@@ -1129,6 +1148,11 @@ document.addEventListener("click", event => {
   if(!heading) return;
   const step = heading.closest(".step");
   if(!step) return;
+
+  if(step.dataset.title === "Klinik" && !isAdminMode()){
+    step.classList.toggle("klinik-open");
+    return;
+  }
 
   if(isAdminMode() && step !== consentStep && step !== reportStep){
     step.classList.toggle("open");
@@ -1371,8 +1395,8 @@ function setOpenStates(){
   workSteps.forEach((step, index) => {
     const title = step.dataset.title || "";
 
-    // Mitarbeiter ist in der Désirée-Version fest vergeben und wird übersprungen.
-    if(title === "Mitarbeiter"){
+    // Mitarbeiter und Klinik werden im normalen Ablauf übersprungen.
+    if(title === "Mitarbeiter" || title === "Klinik"){
       return;
     }
 
@@ -1409,10 +1433,10 @@ function updateConsentFlow(){
 
   if(isAdminMode()){
     $("blockedNotice").style.display = "none";
-    currentWorkIndex = 1;
+    currentWorkIndex = 2;
   }else if(consent === "ja"){
     $("blockedNotice").style.display = "none";
-    currentWorkIndex = 1;
+    currentWorkIndex = 2;
   }else{
     currentWorkIndex = -1;
     $("blockedNotice").style.display = consent ? "block" : "none";
@@ -1458,10 +1482,16 @@ function nextStep(){
 
   if(!validateCurrentStep()) return;
 
-  if(currentWorkIndex < 1){
-    currentWorkIndex = 1;
+  if(currentWorkIndex < 2){
+    currentWorkIndex = 2;
   }else if(currentWorkIndex < workSteps.length - 1){
     currentWorkIndex++;
+    while(
+      currentWorkIndex < workSteps.length - 1 &&
+      ["Mitarbeiter", "Klinik", "Abschlussfrage"].includes(workSteps[currentWorkIndex]?.dataset.title)
+    ){
+      currentWorkIndex++;
+    }
   }
 
   recalcAll();
@@ -1473,8 +1503,14 @@ function nextStep(){
 function prevStep(){
   if(!isAdminMode() && consentValue() !== "ja") return;
 
-  if(currentWorkIndex > 1){
+  if(currentWorkIndex > 2){
     currentWorkIndex--;
+    while(
+      currentWorkIndex > 2 &&
+      ["Mitarbeiter", "Klinik", "Abschlussfrage"].includes(workSteps[currentWorkIndex]?.dataset.title)
+    ){
+      currentWorkIndex--;
+    }
   }
 
   recalcAll();
